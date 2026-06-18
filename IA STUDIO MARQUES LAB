@@ -1,0 +1,62 @@
+<!-- ==================== IA STUDIO MARQUES LAB ==================== -->
+<section class="section alt" id="ia-studio" style="padding: 100px 24px;">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-kicker">IA Studio Marques Lab</div>
+      <h2>Ensaio IA Profissional em Minutos</h2>
+    </div>
+    <p>Envie uma foto, escolha o estilo e gere ensaios sensuais, luxuosos ou impactantes com marca d'água da Marques Lab.</p>
+  </div>
+
+  <div id="ia-studio-app" style="max-width: 960px; margin: 0 auto; background: var(--panel); padding: 48px; border-radius: 16px; border: 1px solid var(--accent);">
+    
+    <!-- 1. Upload -->
+    <div class="ia-step" style="margin-bottom: 32px;">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <h3>Envie sua foto base</h3>
+      </div>
+      <div class="upload-area" onclick="document.getElementById('photo-upload').click()" style="border: 3px dashed var(--accent); padding: 60px; text-align: center; border-radius: 12px; cursor: pointer;">
+        <input type="file" id="photo-upload" accept="image/*" style="display:none;">
+        <p style="font-size: 1.1rem;">📸 Clique aqui para enviar sua foto</p>
+        <small>Selfie, corpo ou referência</small>
+      </div>
+      <img id="uploaded-preview" style="max-height: 320px; margin-top: 20px; border-radius: 12px; display: none; border: 2px solid var(--accent);">
+    </div>
+
+    <!-- 2. Estilos -->
+    <div class="ia-step" style="margin-bottom: 32px;">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <h3>Escolha o estilo</h3>
+      </div>
+      <div id="style-grid" style="display: flex; flex-wrap: wrap; gap: 12px;"></div>
+    </div>
+
+    <!-- 3. Prompt -->
+    <div class="ia-step" style="margin-bottom: 40px;">
+      <div class="step-header">
+        <div class="step-num">3</div>
+        <h3>Descreva o que quer</h3>
+      </div>
+      <textarea id="prompt-input" rows="4" style="width:100%; padding: 16px; background:#1a1a1a; border:1px solid #FF5A1F44; border-radius: 8px; color:white;" placeholder="Ex: mulher nua sensual em quarto de hotel luxuoso, pose provocante, iluminação neon vermelha..."></textarea>
+    </div>
+
+    <button onclick="generatePreview()" style="width:100%; padding: 18px; font-size: 1.25rem; background: linear-gradient(90deg, var(--accent), #E34812); border: none; border-radius: 8px; color: white; cursor: pointer;">
+      ✨ Gerar Prévia com IA
+    </button>
+
+    <!-- Resultado -->
+    <div id="result-container" style="display: none; margin-top: 50px; text-align: center;">
+      <h3 style="color: var(--signal);">✅ Prévia Gerada com Sucesso!</h3>
+      <div style="position: relative; display: inline-block; margin: 25px 0;">
+        <img id="generated-img" style="max-width: 100%; max-height: 520px; border-radius: 12px; box-shadow: 0 25px 60px rgba(0,0,0,0.7);">
+        <div style="position: absolute; bottom: 25px; right: 25px; background: rgba(0,0,0,0.75); padding: 8px 18px; border-radius: 6px; font-weight: bold; color: white;">Marques Lab</div>
+      </div>
+      <div>
+        <button onclick="downloadPreview()" style="padding: 14px 36px; margin-right: 12px; background: #A7F0D6; color: black; border: none; border-radius: 8px;">Baixar Prévia</button>
+        <a href="https://wa.me/5591991805102" target="_blank" style="padding: 14px 36px; background: var(--accent); color: white; text-decoration: none; border-radius: 8px;">Quero o Pack Completo</a>
+      </div>
+    </div>
+  </div>
+</section>
