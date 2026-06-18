@@ -1,0 +1,43 @@
+<section class="section alt" id="processo">
+  <div class="process-wrap">
+    <div class="process-summary reveal">
+      <div class="section-kicker">Método Marques Lab</div>
+      <strong>Simples, rápido e com resultado de alto impacto.</strong>
+      <p>Do briefing até a entrega final, tudo pensado para você vender mais e aparecer com qualidade profissional.</p>
+    </div>
+
+    <div class="process">
+      <div class="process-step reveal">
+        <span>01</span>
+        <div>
+          <h3>Briefing Rápido</h3>
+          <p>Você envia sua ideia, foto ou referência pelo WhatsApp. Entendemos o objetivo (ensaio IA, flyer, palco, etc).</p>
+        </div>
+      </div>
+
+      <div class="process-step reveal">
+        <span>02</span>
+        <div>
+          <h3>Direção Criativa</h3>
+          <p>Definimos o estilo, cores, clima e conceito para o seu projeto ficar único e impactante.</p>
+        </div>
+      </div>
+
+      <div class="process-step reveal">
+        <span>03</span>
+        <div>
+          <h3>Produção com IA + Design</h3>
+          <p>Criamos as peças (ensaios, motion, visual stage) com foco em qualidade e uso real nas redes e palco.</p>
+        </div>
+      </div>
+
+      <div class="process-step reveal">
+        <span>04</span>
+        <div>
+          <h3>Entrega + Suporte</h3>
+          <p>Você recebe os arquivos prontos + ajustes se necessário. Tudo pronto para postar e vender.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
