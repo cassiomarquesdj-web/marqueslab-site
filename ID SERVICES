@@ -1,0 +1,72 @@
+<section class="section" id="servicos">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-kicker">Serviços Premium</div>
+      <h2>O que você realmente precisa para se destacar</h2>
+    </div>
+    <p>Escolha entregas pontuais ou pacotes completos para seu lançamento, show ou campanha.</p>
+  </div>
+
+  <div class="service-grid">
+    <!-- Card 1 -->
+    <article class="service-card reveal">
+      <div class="card-top">
+        <span class="card-number">01</span>
+        <span class="card-icon">ID</span>
+      </div>
+      <h3>Identidade Visual</h3>
+      <p>Logo, paleta, tipografia e linguagem visual completa para sua marca ou artista.</p>
+    </article>
+
+    <!-- Card 2 -->
+    <article class="service-card reveal">
+      <div class="card-top">
+        <span class="card-number">02</span>
+        <span class="card-icon">AR</span>
+      </div>
+      <h3>Direção Visual para Artistas</h3>
+      <p>Conceito completo para single, álbum, show ou nova fase da carreira.</p>
+    </article>
+
+    <!-- Card 3 -->
+    <article class="service-card reveal">
+      <div class="card-top">
+        <span class="card-number">03</span>
+        <span class="card-icon">MO</span>
+      </div>
+      <h3>Motion Flyers</h3>
+      <p>Flyers animados para Reels, Stories e telões com alto impacto.</p>
+    </article>
+
+    <!-- Card 4 -->
+    <article class="service-card reveal">
+      <div class="card-top">
+        <span class="card-number">04</span>
+        <span class="card-icon">VS</span>
+      </div>
+      <h3>Visual Stage</h3>
+      <p>Artes para palco, LED, entrada de DJ e experiência ao vivo.</p>
+    </article>
+
+    <!-- Card 5 - Ensaio IA -->
+    <article class="service-card reveal">
+      <div class="card-top">
+        <span class="card-number">05</span>
+        <span class="card-icon">IA</span>
+      </div>
+      <h3>Ensaio IA Profissional</h3>
+      <p>Imagens geradas com estética de estúdio em poucos minutos. Perfeito para divulgação +18.</p>
+      <a href="#ia-studio" style="color: var(--accent); font-weight: 700; margin-top: 12px; display: inline-block;">→ Experimentar agora</a>
+    </article>
+
+    <!-- Card 6 -->
+    <article class="service-card reveal">
+      <div class="card-top">
+        <span class="card-number">06</span>
+        <span class="card-icon">EV</span>
+      </div>
+      <h3>Campanhas para Eventos</h3>
+      <p>Flyers, KV, stories e peças completas para lotar sua agenda.</p>
+    </article>
+  </div>
+</section>
