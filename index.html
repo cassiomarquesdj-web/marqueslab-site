@@ -1,43 +1,462 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Marques Lab | Laboratório de Impacto Visual</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0a0a0a;
-      --panel: #111;
-      --accent: #FF5A1F;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: #eee; }
-    .btn { background: var(--accent); color: white; padding: 16px 36px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s; }
-    .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255,90,31,0.4); }
-    .section { padding: 100px 20px; text-align: center; }
-    .service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 1200px; margin: 40px auto; }
-    .card { background: #111; padding: 32px; border-radius: 12px; transition: all 0.3s; }
-    .card:hover { transform: translateY(-10px); border-color: var(--accent); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Marques Lab</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--bg:#070707;
+--text:#F8F8F8;
+--muted:#8B8B8B;
+--accent:#FF5A1F;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html{
+scroll-behavior:smooth;
+}
+
+body{
+font-family:'Inter',sans-serif;
+background:var(--bg);
+color:var(--text);
+overflow-x:hidden;
+}
+
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:
+radial-gradient(circle at 70% 20%,
+rgba(255,90,31,.12),
+transparent 35%);
+pointer-events:none;
+z-index:-1;
+}
+
+header{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+padding:25px 8%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+backdrop-filter:blur(12px);
+background:rgba(7,7,7,.65);
+z-index:999;
+}
+
+.logo{
+font-size:1rem;
+font-weight:900;
+letter-spacing:.15em;
+text-transform:uppercase;
+}
+
+nav{
+display:flex;
+gap:30px;
+}
+
+nav a{
+text-decoration:none;
+color:#aaa;
+font-size:.9rem;
+transition:.3s;
+}
+
+nav a:hover{
+color:white;
+}
+
+.btn{
+padding:14px 24px;
+background:var(--accent);
+border-radius:8px;
+color:white;
+text-decoration:none;
+font-weight:700;
+transition:.3s;
+}
+
+.btn:hover{
+transform:translateY(-2px);
+}
+
+.hero{
+min-height:100vh;
+display:flex;
+align-items:center;
+padding:0 8%;
+}
+
+.hero-content{
+max-width:900px;
+}
+
+.hero span{
+color:var(--accent);
+font-weight:800;
+text-transform:uppercase;
+font-size:.85rem;
+letter-spacing:.15em;
+}
+
+.hero h1{
+font-size:clamp(4rem,8vw,8rem);
+line-height:.92;
+margin:25px 0;
+font-weight:900;
+}
+
+.hero p{
+max-width:650px;
+font-size:1.15rem;
+color:var(--muted);
+line-height:1.8;
+margin-bottom:40px;
+}
+
+.section{
+padding:120px 8%;
+}
+
+.section-title{
+font-size:clamp(2.5rem,5vw,4rem);
+margin-bottom:15px;
+}
+
+.section-sub{
+color:var(--muted);
+max-width:700px;
+margin-bottom:60px;
+}
+
+.services{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:40px;
+}
+
+.service{
+padding-bottom:25px;
+border-bottom:1px solid rgba(255,255,255,.08);
+transition:.3s;
+}
+
+.service:hover{
+transform:translateX(10px);
+}
+
+.service h3{
+margin-bottom:15px;
+font-size:1.3rem;
+}
+
+.service p{
+color:var(--muted);
+line-height:1.8;
+}
+
+.studio{
+text-align:center;
+padding:140px 8%;
+background:linear-gradient(
+180deg,
+transparent,
+rgba(255,255,255,.02)
+);
+}
+
+.studio h2{
+font-size:clamp(3rem,6vw,5rem);
+margin-bottom:20px;
+}
+
+.studio p{
+max-width:700px;
+margin:auto;
+color:var(--muted);
+margin-bottom:40px;
+}
+
+.upload-box{
+max-width:700px;
+margin:auto;
+padding:50px;
+border:1px dashed rgba(255,255,255,.15);
+border-radius:16px;
+}
+
+.upload-box input,
+.upload-box select,
+.upload-box textarea{
+width:100%;
+margin-bottom:15px;
+padding:16px;
+background:#111;
+border:none;
+border-radius:8px;
+color:white;
+}
+
+.upload-box textarea{
+height:150px;
+}
+
+.cta{
+padding:150px 8%;
+text-align:center;
+}
+
+.cta h2{
+font-size:clamp(3rem,7vw,6rem);
+line-height:.95;
+margin-bottom:25px;
+}
+
+.cta p{
+color:var(--muted);
+max-width:700px;
+margin:auto auto 40px;
+}
+
+footer{
+padding:40px 8%;
+border-top:1px solid rgba(255,255,255,.08);
+display:flex;
+justify-content:space-between;
+flex-wrap:wrap;
+gap:20px;
+}
+
+.reveal{
+opacity:0;
+transform:translateY(40px);
+transition:.8s ease;
+}
+
+.reveal.active{
+opacity:1;
+transform:translateY(0);
+}
+
+@media(max-width:768px){
+
+nav{
+display:none;
+}
+
+.hero h1{
+font-size:3.5rem;
+}
+
+}
+
+</style>
+
 </head>
+
 <body>
 
-  <!-- HERO -->
-  <section style="padding: 160px 20px; background: linear-gradient(#1a1a1a, #0a0a0a); text-align: center;">
-    <img src="https://via.placeholder.com/150x150/FF5A1F/fff?text=ML" alt="Marques Lab Logo" style="width: 120px; margin-bottom: 20px;">
-    <h1 style="font-size: 3.5rem;">Visual premium para artistas e eventos.</h1>
-    <p style="font-size: 1.4rem; max-width: 800px; margin: 30px auto;">Do flyer ao palco, com ensaios IA profissionais.</p>
-    <a href="https://wa.me/5591991805102" class="btn">Falar no WhatsApp</a>
-  </section>
+<header>
 
-  <!-- Outras seções aqui... -->
+<div class="logo">
+MARQUES LAB
+</div>
 
-  <script>
-    // Animações simples
-    document.querySelectorAll('.card').forEach(card => {
-      card.addEventListener('mouseenter', () => card.style.transform = 'scale(1.03)');
-    });
-  </script>
+<nav>
+<a href="#servicos">Serviços</a>
+<a href="#studio">IA Studio</a>
+<a href="#contato">Contato</a>
+</nav>
+
+<a
+class="btn"
+href="https://wa.me/5591991805102"
+target="_blank">
+WhatsApp </a>
+
+</header>
+
+<section class="hero">
+
+<div class="hero-content reveal">
+
+<span>Laboratório de Impacto Visual</span>
+
+<h1>
+Visual premium para artistas, eventos e marcas.
+</h1>
+
+<p>
+Design, Motion Graphics, Audiovisual, Visual Stage e Inteligência Artificial para quem precisa chamar atenção e gerar valor.
+</p>
+
+<a
+class="btn"
+href="https://wa.me/5591991805102"
+target="_blank">
+Solicitar orçamento </a>
+
+</div>
+
+</section>
+
+<section id="servicos" class="section">
+
+<div class="reveal">
+
+<h2 class="section-title">
+Serviços
+</h2>
+
+<p class="section-sub">
+Soluções criativas desenvolvidas para posicionamento, divulgação e impacto visual.
+</p>
+
+</div>
+
+<div class="services">
+
+<div class="service reveal">
+<h3>Motion Flyers</h3>
+<p>Animações profissionais para eventos e artistas.</p>
+</div>
+
+<div class="service reveal">
+<h3>Visual Stage</h3>
+<p>Conteúdo para painéis de LED e telões.</p>
+</div>
+
+<div class="service reveal">
+<h3>Audiovisual</h3>
+<p>Captação, edição e produção visual.</p>
+</div>
+
+<div class="service reveal">
+<h3>Ensaio IA</h3>
+<p>Fotos profissionais geradas com inteligência artificial.</p>
+</div>
+
+<div class="service reveal">
+<h3>Identidade Visual</h3>
+<p>Marcas modernas e memoráveis.</p>
+</div>
+
+<div class="service reveal">
+<h3>Campanhas para Eventos</h3>
+<p>Estratégia visual para gerar vendas.</p>
+</div>
+
+</div>
+
+</section>
+
+<section id="studio" class="studio">
+
+<div class="reveal">
+
+<h2>IA Studio</h2>
+
+<p>
+Envie sua foto, descreva sua ideia e gere um briefing para seu ensaio com inteligência artificial.
+</p>
+
+<div class="upload-box">
+
+<input type="file">
+
+<select>
+<option>DJ</option>
+<option>Artista</option>
+<option>Empresarial</option>
+<option>Luxo</option>
+<option>Futurista</option>
+</select>
+
+<textarea placeholder="Descreva sua ideia"></textarea>
+
+<a
+class="btn"
+href="https://wa.me/5591991805102">
+Enviar para Marques Lab </a>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="cta" id="contato">
+
+<div class="reveal">
+
+<h2>
+Vamos criar algo incrível?
+</h2>
+
+<p>
+Entre em contato e transforme sua ideia em impacto visual.
+</p>
+
+<a
+class="btn"
+href="https://wa.me/5591991805102">
+Falar no WhatsApp </a>
+
+</div>
+
+</section>
+
+<footer>
+
+<div>
+Marques Lab © 2026
+</div>
+
+<div>
+@_marqueslab
+</div>
+
+</footer>
+
+<script>
+
+const reveal = document.querySelectorAll('.reveal');
+
+const observer = new IntersectionObserver(entries=>{
+
+entries.forEach(entry=>{
+
+if(entry.isIntersecting){
+
+entry.target.classList.add('active');
+
+}
+
+});
+
+});
+
+reveal.forEach(el=>observer.observe(el));
+
+</script>
+
 </body>
 </html>
