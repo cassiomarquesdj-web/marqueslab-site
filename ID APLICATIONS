@@ -1,0 +1,26 @@
+<section class="section" id="aplicacoes">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-kicker">Onde seu visual brilha</div>
+      <h2>Visual para o momento certo</h2>
+    </div>
+    <p>Cada peça é pensada para atrair atenção, valorizar seu trabalho e converter em vendas ou presença.</p>
+  </div>
+
+  <div class="showcase">
+    <article class="showcase-panel reveal">
+      <h3>Artistas & Lançamentos</h3>
+      <p>Ensaios IA, capas de single, direção visual completa e conteúdo para redes sociais.</p>
+    </article>
+
+    <article class="showcase-panel reveal">
+      <h3>Eventos & Festas</h3>
+      <p>Flyers, motion flyers, KV, peças de anúncio e visual stage para lotar o evento.</p>
+    </article>
+
+    <article class="showcase-panel reveal">
+      <h3>Palco & Experiência Ao Vivo</h3>
+      <p>Visuals para telão, LED, backdrop, entrada de DJ e momentos marcantes do show.</p>
+    </article>
+  </div>
+</section>
