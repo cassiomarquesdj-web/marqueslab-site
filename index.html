@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,82 +7,110 @@
 <title>Marques Lab | ML Vision IA</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#050505;--card:#101010;--text:#f5f5f5;--muted:#9a9a9a;--accent:#ff5a1f}
+:root{--bg:#050505;--text:#f5f5f5;--muted:#9a9a9a;--accent:#ff5a1f}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text)}
 body:before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 80% 10%,rgba(255,90,31,.15),transparent 30%);pointer-events:none}
-header{position:fixed;top:0;width:100%;padding:22px 8%;display:flex;justify-content:space-between;background:rgba(5,5,5,.75);backdrop-filter:blur(12px);z-index:10}
+header{position:fixed;top:0;width:100%;padding:22px 8%;display:flex;justify-content:space-between;background:rgba(5,5,5,.75);backdrop-filter:blur(12px)}
 nav a{color:#bbb;text-decoration:none;margin-left:24px}
 .hero{min-height:100vh;display:flex;align-items:center;padding:0 8%}
 .hero h1{font-size:clamp(3rem,8vw,7rem);line-height:.95;margin:20px 0}
-.hero p{max-width:700px;color:var(--muted);font-size:1.1rem}
+.hero p{max-width:700px;color:var(--muted)}
 .btn{display:inline-block;margin-top:30px;padding:16px 28px;background:var(--accent);color:#fff;text-decoration:none;border-radius:10px}
 .section{padding:120px 8%}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:24px}
-.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:28px;border-radius:18px;transition:.3s}
-.card:hover{transform:translateY(-8px)}
-.studio{background:linear-gradient(180deg,transparent,#0d0d0d)}
+.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:28px;border-radius:18px;margin-bottom:20px}
 input,select,textarea{width:100%;padding:16px;background:#111;border:1px solid #222;color:white;border-radius:10px;margin-bottom:14px}
 textarea{height:140px}
-.socials{margin-top:25px;display:flex;gap:20px;flex-wrap:wrap}
-.socials a{text-decoration:none;color:#fff}
-.badge{display:inline-flex;gap:12px;padding:10px 18px;border:1px solid rgba(255,255,255,.08);border-radius:999px;margin-bottom:25px;color:#aaa;background:rgba(255,255,255,.03)}
-footer{padding:40px 8%;border-top:1px solid #222;color:#999;display:flex;justify-content:space-between;flex-wrap:wrap}
-footer a{color:#fff;text-decoration:none;margin-left:15px}
+.socials{margin-top:20px;display:flex;gap:20px;flex-wrap:wrap}
+.socials a{color:#fff;text-decoration:none}
+footer{padding:40px 8%;border-top:1px solid #222;display:flex;justify-content:space-between;flex-wrap:wrap}
 </style>
 </head>
 <body>
+
 <header>
 <div><strong>MARQUES LAB</strong></div>
 <nav>
-<a href="#servicos">Serviços</a>
 <a href="#mlvision">ML Vision IA</a>
+<a href="#ledvision">LED Vision</a>
 <a href="#contato">Contato</a>
 </nav>
 </header>
 
 <section class="hero">
 <div>
-<div class="badge"><span>⚡ IA</span><span>🎬 Motion</span><span>📺 Visual Stage</span><span>🎨 Design</span></div>
 <div style="color:#ff5a1f;font-weight:700">Creative Technology Studio</div>
 <h1>Criamos experiências visuais para artistas, eventos e marcas.</h1>
 <p>Design, Motion Graphics, Audiovisual, Visual Stage e Inteligência Artificial para projetos que precisam ser impossíveis de ignorar.</p>
-<a class="btn" href="https://wa.me/5591991805102" target="_blank">Solicitar Projeto</a>
+<a class="btn" href="https://wa.me/5591991805102">Solicitar Projeto</a>
+
 <div class="socials">
-<a href="https://instagram.com/_marqueslab" target="_blank">📸 Siga @_marqueslab</a>
+<a href="https://instagram.com/_marqueslab" target="_blank">📸 @_marqueslab</a>
 <a href="https://wa.me/5591991805102" target="_blank">💬 WhatsApp</a>
 </div>
 </div>
 </section>
 
-<section class="section" id="servicos">
-<h2 style="font-size:3rem;margin-bottom:40px">Selected Capabilities</h2>
-<div class="grid">
-<div class="card">Motion Design</div>
-<div class="card">Visual Stage</div>
-<div class="card">Audiovisual</div>
-<div class="card">Identidade Visual</div>
-<div class="card">ML Vision IA</div>
-<div class="card">Campanhas para Eventos</div>
-</div>
-</section>
-
-<section class="section studio" id="mlvision">
+<section class="section" id="mlvision">
 <h2 style="font-size:4rem;margin-bottom:20px">ML VISION IA</h2>
 <p style="color:#aaa;max-width:700px;margin-bottom:40px">Transforme uma foto comum em um conceito visual cinematográfico.</p>
-<div style="max-width:800px">
+
+<div class="card">
 <input placeholder="Seu Nome">
 <input placeholder="Seu WhatsApp">
 <input type="file">
 <select>
-<option>DJ Profissional</option><option>Artista</option><option>Empresarial</option><option>Luxo</option><option>Futurista</option>
+<option>DJ Profissional</option>
+<option>Artista</option>
+<option>Empresarial</option>
+<option>Luxo</option>
+<option>Futurista</option>
 </select>
 <textarea placeholder="Descreva sua ideia..."></textarea>
-<a class="btn" href="https://wa.me/5591991805102" target="_blank">Criar Meu Conceito</a>
-<div class="socials">
-<a href="https://instagram.com/_marqueslab" target="_blank">Instagram</a>
-<a href="https://wa.me/5591991805102" target="_blank">WhatsApp</a>
+<a class="btn" href="https://wa.me/5591991805102">Criar Meu Conceito</a>
 </div>
+</section>
+
+<section class="section" id="ledvision">
+<h2 style="font-size:4rem;margin-bottom:20px">LED VISION</h2>
+<p style="color:#aaa;max-width:800px;margin-bottom:40px">
+Gerador de prompts para telões de LED, loops visuais, shows, festivais e apresentações.
+</p>
+
+<div class="card">
+
+<select>
+<option>DJ Set</option>
+<option>Festival</option>
+<option>Formatura</option>
+<option>Casamento</option>
+<option>Evento Corporativo</option>
+<option>Show Gospel</option>
+</select>
+
+<select>
+<option>Futurista</option>
+<option>Cyberpunk</option>
+<option>Minimalista</option>
+<option>Luxo</option>
+<option>Techno</option>
+<option>Cinematográfico</option>
+</select>
+
+<select>
+<option>Laranja</option>
+<option>Azul</option>
+<option>Dourado</option>
+<option>Vermelho</option>
+<option>Branco</option>
+</select>
+
+<input placeholder="Nome do Evento ou Artista">
+
+<textarea placeholder="Ex: Caio & Cassio, palco gigante, partículas de energia, loop infinito 16:9"></textarea>
+
+<a class="btn" href="https://wa.me/5591991805102">Gerar Prompt LED</a>
+
 </div>
 </section>
 
@@ -93,9 +122,9 @@ footer a{color:#fff;text-decoration:none;margin-left:15px}
 <footer>
 <div>Marques Lab © 2026</div>
 <div>
-<a href="https://instagram.com/_marqueslab" target="_blank">Instagram</a>
-<a href="https://wa.me/5591991805102" target="_blank">WhatsApp</a>
-<a href="https://marqueslab.com.br" target="_blank">marqueslab.com.br</a>
+<a href="https://instagram.com/_marqueslab">Instagram</a>
 </div>
 </footer>
-</body></html>
+
+</body>
+</html>
