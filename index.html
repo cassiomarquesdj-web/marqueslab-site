@@ -8,49 +8,52 @@
   <style>
     :root {
       --bg: #0a0a0a;
-      --panel: #111;
-      --text: #eee;
+      --panel: #111111;
+      --text: #f0f0f0;
       --accent: #FF5A1F;
+      --signal: #A7F0D6;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
-    .section { padding: 80px 20px; text-align: center; }
-    h1 { font-size: 3rem; margin-bottom: 20px; }
-    .btn-primary { background: var(--accent); color: white; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; margin: 20px 0; }
-    .service-grid, .showcase { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-    .service-card, .showcase-panel, .ia-step { background: var(--panel); padding: 30px; border-radius: 12px; border: 1px solid #FF5A1F33; margin: 10px 0; }
+    .section { padding: 80px 20px; }
+    h1 { font-size: 3.2rem; line-height: 1.1; margin-bottom: 20px; }
+    .btn-primary { background: var(--accent); color: white; padding: 18px 40px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; margin: 20px 0; }
+    .service-grid, .showcase { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 1200px; margin: 40px auto; }
+    .service-card, .showcase-panel, .ia-step { background: var(--panel); padding: 32px; border-radius: 12px; border: 1px solid #FF5A1F33; }
+    .ia-step { margin: 20px 0; }
+    .upload-area { border: 3px dashed var(--accent); padding: 60px; text-align: center; border-radius: 12px; cursor: pointer; }
   </style>
 </head>
 <body>
 
   <!-- HERO -->
-  <section class="hero" style="padding: 120px 20px; background: linear-gradient(#1a1a1a, #0a0a0a);">
-    <div>
-      <div style="color: var(--accent); text-transform: uppercase; font-weight: bold;">Estúdio de Impacto Visual</div>
+  <section style="padding: 140px 20px; text-align: center; background: linear-gradient(#1f1f1f, #0a0a0a);">
+    <div style="max-width: 900px; margin: 0 auto;">
+      <div style="color: var(--accent); font-weight: 700; letter-spacing: 2px;">ESTÚDIO DE IMPACTO VISUAL</div>
       <h1>Visual premium para artistas e eventos.<br>Do flyer ao palco.</h1>
-      <p>Identidade visual, direção artística, motion flyers, visual stage e ensaios IA profissionais em minutos.</p>
+      <p style="font-size: 1.3rem; max-width: 700px; margin: 30px auto;">Identidade visual, direção artística, motion flyers, visual stage e ensaios IA profissionais em minutos.</p>
       <a href="https://wa.me/5591991805102" class="btn-primary">Falar no WhatsApp</a>
     </div>
   </section>
 
   <!-- SERVIÇOS -->
   <section class="section" id="servicos">
-    <h2>Nossos Serviços</h2>
+    <h2 style="text-align:center;">Nossos Serviços</h2>
     <div class="service-grid">
-      <!-- Seus cards de serviços aqui -->
+      <!-- Seus 6 cards aqui -->
     </div>
   </section>
 
   <!-- IA STUDIO -->
   <section class="section" id="ia-studio">
-    <h2>IA Studio Marques Lab</h2>
+    <h2 style="text-align:center;">IA Studio Marques Lab</h2>
     <!-- Seu IA Studio completo aqui -->
   </section>
 
-  <!-- PROCESSO, APLICACOES, CTA -->
+  <!-- PROCESSO, APLICACOES, CTA, FOOTER -->
 
-  <footer style="padding: 40px; text-align: center; border-top: 1px solid #333;">
-    Marques Lab © 2026 • <a href="https://wa.me/5591991805102">WhatsApp</a>
+  <footer style="padding: 60px 20px; text-align: center; border-top: 1px solid #333;">
+    Marques Lab © 2026 • <a href="https://wa.me/5591991805102" style="color:var(--accent);">WhatsApp</a>
   </footer>
 
 </body>
