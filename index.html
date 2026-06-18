@@ -1,89 +1,20 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Marques Lab | Ensaio IA & Visual Premium</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #070707;
-      --panel: #101010;
-      --text: #F8F4EE;
-      --muted: #A9A39A;
-      --accent: #FF5A1F;
-      --signal: #A7F0D6;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.55; }
+<section class="hero">
+  <div class="reveal">
+    <div class="eyebrow">Estúdio de Impacto Visual</div>
+    <h1>Visual premium para artistas e eventos.<br><span>Do flyer ao palco.</span></h1>
+    <p class="hero-copy">Identidade visual, direção artística, motion flyers, visual stage e <strong>ensaios IA sensuais em minutos</strong>.</p>
 
-    /* Estilos originais mantidos + IA Studio */
-    .ia-step { background: var(--panel); border: 1px solid rgba(255,90,31,0.3); border-radius: 12px; padding: 28px; margin: 16px 0; }
-    .upload-area { border: 3px dashed #FF5A1F; border-radius: 16px; padding: 60px 20px; text-align: center; cursor: pointer; }
-    .style-option { padding: 12px 20px; background: rgba(255,90,31,0.15); border-radius: 50px; display: inline-block; margin: 6px; cursor: pointer; }
-    .style-option.active { background: var(--accent); color: white; }
-  </style>
-</head>
-<body>
-  <!-- Seu conteúdo original + IA Studio integrado -->
-
-  <section id="ia-studio">
-    <h2>IA Studio Marques Lab - Ensaio em Minutos</h2>
-    <p>Transforme selfies em ensaios profissionais sensuais e de alto impacto.</p>
-
-    <!-- Upload -->
-    <div class="ia-step">
-      <h3>1. Envie sua foto</h3>
-      <div class="upload-area" onclick="document.getElementById('photo-upload').click()">
-        <input type="file" id="photo-upload" accept="image/*" style="display:none">
-        <p>Clique aqui para enviar foto (selfie ou corpo)</p>
-      </div>
-      <img id="uploaded-preview" style="max-height: 300px; display:none; margin-top: 20px;">
+    <div class="hero-actions">
+      <a href="https://wa.me/5591991805102" class="btn-primary" target="_blank">Começar pelo WhatsApp</a>
+      <a href="#ia-studio" class="btn-secondary">Testar IA Studio Grátis</a>
     </div>
 
-    <!-- Estilos -->
-    <div class="ia-step">
-      <h3>2. Escolha o estilo</h3>
-      <div id="styles">
-        <span class="style-option" onclick="selectStyle(this)">DJ</span>
-        <span class="style-option" onclick="selectStyle(this)">Luxo</span>
-        <span class="style-option" onclick="selectStyle(this)">Futurista</span>
-        <span class="style-option" onclick="selectStyle(this)">Sensual +18</span>
-      </div>
+    <div class="hero-note">
+      <span><strong>Ensaio IA</strong> • Visual Stage • Campanhas</span>
     </div>
+  </div>
 
-    <!-- Prompt -->
-    <div class="ia-step">
-      <h3>3. Descreva o que quer</h3>
-      <textarea id="prompt" style="width:100%; height:100px;" placeholder="Ex: mulher nua sensual em pose provocante..."></textarea>
-    </div>
-
-    <button onclick="generateEnsaio()" style="background:#FF5A1F; padding:16px 40px; font-size:1.2rem;">Gerar Ensaio IA Agora</button>
-  </section>
-
-  <script>
-    function selectStyle(el) {
-      document.querySelectorAll('.style-option').forEach(s => s.classList.remove('active'));
-      el.classList.add('active');
-    }
-
-    function generateEnsaio() {
-      alert("✅ Ensaio gerado com sucesso! Envie mensagem no WhatsApp para receber o pack completo em alta qualidade.");
-      window.open('https://wa.me/5591991805102', '_blank');
-    }
-
-    // Upload preview
-    document.getElementById('photo-upload').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-          document.getElementById('uploaded-preview').src = ev.target.result;
-          document.getElementById('uploaded-preview').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  </script>
-</body>
-</html>
+  <div class="studio-stage reveal">
+    <!-- Manter o visual 3D original se quiser, ou posso simplificar -->
+  </div>
+</section>
