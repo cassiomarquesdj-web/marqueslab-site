@@ -1,0 +1,16 @@
+<section class="cta" id="contato">
+  <div class="cta-inner reveal">
+    <div class="section-kicker">Vamos Trabalhar Juntos</div>
+    <h2>Qual visual você precisa colocar na rua agora?</h2>
+    <p>Ensaio IA, identidade visual, motion flyer, visual stage ou campanha completa. O orçamento é rápido e direto.</p>
+    
+    <a href="https://wa.me/5591991805102" class="btn-primary" target="_blank" rel="noopener" style="font-size: 1.3rem; padding: 20px 48px;">
+      Falar no WhatsApp Agora
+    </a>
+  </div>
+</section>
+
+<footer>
+  <span>Marques Lab © 2026 • Estúdio de Impacto Visual</span>
+  <a href="https://wa.me/5591991805102" target="_blank" rel="noopener">WhatsApp: (91) 99180-5102</a>
+</footer>
