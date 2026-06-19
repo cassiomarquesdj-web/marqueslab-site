@@ -3,134 +3,634 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marques Lab | ML Vision IA</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#050505">
+<meta name="description" content="Marques Lab — Laboratório de impacto visual. Design, Motion, Audiovisual, Visual Stage e Inteligência Artificial. Visuais surreais que fecham negócio só de olhar.">
+<title>Marques Lab | ML Vision IA — Impacto Visual Surreal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#050505;--text:#f5f5f5;--muted:#9a9a9a;--accent:#ff5a1f}
+:root{
+  --bg:#040406;
+  --text:#f6f6f7;
+  --muted:#9a9aa6;
+  --muted-2:#6a6a76;
+  --border:rgba(255,255,255,.09);
+  --border-strong:rgba(255,255,255,.18);
+  --surface:rgba(255,255,255,.04);
+  --surface-2:rgba(255,255,255,.07);
+  --accent:#ff5a1f;
+  --accent-2:#ff8a3d;
+  --violet:#7b2ff7;
+  --magenta:#ff2fb0;
+  --cyan:#22d3ee;
+  --glow:rgba(255,90,31,.5);
+  --radius:24px;
+  --maxw:1200px;
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text)}
-header{position:fixed;top:0;width:100%;padding:20px 8%;display:flex;justify-content:space-between;background:rgba(5,5,5,.8);backdrop-filter:blur(10px)}
-nav a{color:#ccc;text-decoration:none;margin-left:20px}
-.hero,.section{padding:120px 8%}
-.hero{min-height:100vh;display:flex;align-items:center}
-h1{font-size:clamp(3rem,8vw,7rem);line-height:.95}
-h2{font-size:clamp(2rem,5vw,4rem);margin-bottom:20px}
-p{color:var(--muted)}
-.card{background:#101010;border:1px solid #222;padding:30px;border-radius:20px;max-width:900px}
-input,select,textarea{width:100%;padding:15px;margin:10px 0;background:#0d0d0d;border:1px solid #222;border-radius:10px;color:white}
-textarea{height:140px}
-.btn{background:var(--accent);color:#fff;padding:14px 24px;border:none;border-radius:10px;cursor:pointer;margin-top:10px}
-.resultado{margin-top:20px;padding:20px;background:#0d0d0d;border-radius:12px;white-space:pre-wrap}
-footer{padding:40px 8%;border-top:1px solid #222}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#fff}
+img{max-width:100%}
+
+/* ---------- BACKGROUND LAYERS ---------- */
+#bg-canvas{position:fixed;inset:0;z-index:0;opacity:.55}
+.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.aurora span{position:absolute;display:block;border-radius:50%;filter:blur(90px);opacity:.5;mix-blend-mode:screen;will-change:transform}
+.aurora .a1{width:60vw;height:60vw;background:radial-gradient(circle,var(--accent),transparent 65%);top:-18vw;right:-12vw;animation:drift1 22s ease-in-out infinite}
+.aurora .a2{width:55vw;height:55vw;background:radial-gradient(circle,var(--magenta),transparent 65%);bottom:-22vw;left:-14vw;animation:drift2 26s ease-in-out infinite}
+.aurora .a3{width:46vw;height:46vw;background:radial-gradient(circle,var(--violet),transparent 65%);top:35%;left:40%;animation:drift3 30s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-7vw,6vw) scale(1.15)}}
+@keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(8vw,-5vw) scale(1.2)}}
+@keyframes drift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-6vw,-7vw) scale(1.1)}}
+/* grain + vignette */
+.fx{position:fixed;inset:0;z-index:2;pointer-events:none}
+.fx.grain{opacity:.5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E")}
+.fx.vignette{background:radial-gradient(120% 120% at 50% 40%,transparent 55%,rgba(0,0,0,.55))}
+.content{position:relative;z-index:3}
+
+/* ---------- CUSTOM CURSOR ---------- */
+.cursor-dot,.cursor-ring{position:fixed;top:0;left:0;z-index:9999;pointer-events:none;border-radius:50%;transform:translate(-50%,-50%);mix-blend-mode:screen}
+.cursor-dot{width:7px;height:7px;background:var(--accent-2);box-shadow:0 0 14px var(--glow)}
+.cursor-ring{width:38px;height:38px;border:1.5px solid rgba(255,138,61,.6);transition:width .2s,height .2s,background .2s,border-color .2s}
+.cursor-ring.hover{width:60px;height:60px;background:rgba(255,90,31,.12);border-color:var(--accent)}
+@media (hover:none){.cursor-dot,.cursor-ring{display:none}}
+
+/* ---------- INTRO ---------- */
+#intro{position:fixed;inset:0;z-index:10000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:26px;transition:opacity .8s ease,visibility .8s}
+#intro.hide{opacity:0;visibility:hidden}
+#intro .logo{display:flex;align-items:center;gap:14px;opacity:0;transform:translateY(14px);animation:introRise .8s cubic-bezier(.2,.8,.2,1) forwards .1s}
+#intro .logo .logo-icon{height:54px;filter:drop-shadow(0 0 18px rgba(255,90,31,.55))}
+#intro .logo .logo-text{font-size:clamp(1.3rem,5vw,2.1rem);letter-spacing:.22em}
+@keyframes introRise{to{opacity:1;transform:none}}
+#intro .bar{width:min(260px,60vw);height:2px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden}
+#intro .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--magenta));animation:load 1.5s ease forwards .2s}
+@keyframes load{to{width:100%}}
+#intro .tagline{color:var(--muted-2);font-size:.78rem;letter-spacing:.28em;text-transform:uppercase;opacity:0;animation:fade .6s ease forwards 1s}
+@keyframes fade{to{opacity:1}}
+
+/* ---------- HEADER ---------- */
+header{position:fixed;top:0;left:0;width:100%;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:18px clamp(18px,7vw,80px);transition:.35s;border-bottom:1px solid transparent}
+header.scrolled{background:rgba(6,6,8,.72);backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);border-bottom:1px solid var(--border);padding-top:13px;padding-bottom:13px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo-icon{height:24px;width:auto;display:block;flex:none;filter:drop-shadow(0 0 9px rgba(255,90,31,.4))}
+.logo-text{font-family:'Sora',sans-serif;font-weight:800;letter-spacing:.16em;font-size:.92rem;color:#fff;white-space:nowrap}
+nav{display:flex;align-items:center;gap:4px}
+nav a{color:var(--muted);font-size:.9rem;font-weight:500;padding:9px 15px;border-radius:999px;transition:.25s}
+nav a:hover{color:#fff;background:var(--surface)}
+nav .nav-cta{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 10px 26px -10px var(--glow)}
+nav .nav-cta:hover{filter:brightness(1.08)}
+.menu-btn{display:none;background:none;border:1px solid var(--border);border-radius:12px;width:46px;height:46px;cursor:pointer;flex-direction:column;gap:5px;align-items:center;justify-content:center}
+.menu-btn span{width:20px;height:2px;background:#fff;border-radius:2px;transition:.3s}
+.menu-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.menu-btn.open span:nth-child(2){opacity:0}
+.menu-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* ---------- GENERIC ---------- */
+.wrap{max-width:var(--maxw);margin:0 auto}
+section{padding:clamp(80px,12vw,150px) clamp(18px,7vw,80px);position:relative}
+.kicker{display:inline-flex;align-items:center;gap:9px;font-family:'Sora',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--accent-2);padding:8px 16px;border:1px solid var(--border);border-radius:999px;background:var(--surface);margin-bottom:26px}
+.kicker::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--glow)}
+h1,h2,h3{font-family:'Sora',sans-serif;font-weight:700;letter-spacing:-.025em;line-height:1.02}
+h2{font-size:clamp(2rem,5.2vw,3.8rem);margin-bottom:16px}
+.lead{color:var(--muted);font-size:clamp(1rem,1.4vw,1.18rem);max-width:580px}
+.grad{background:linear-gradient(110deg,var(--accent),var(--magenta) 45%,var(--violet) 80%,var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% auto;animation:hue 8s linear infinite}
+@keyframes hue{to{background-position:200% center}}
+
+/* ---------- HERO ---------- */
+.hero{min-height:100svh;display:flex;align-items:center;padding-top:130px}
+.hero-inner{max-width:var(--maxw);margin:0 auto;width:100%}
+.hero h1{font-size:clamp(2.8rem,8.5vw,7rem);margin:8px 0 26px}
+.hero h1 .word{display:inline-block;opacity:0;transform:translateY(40px) rotate(4deg);animation:wordup .8s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes wordup{to{opacity:1;transform:none}}
+.hero .lead{font-size:clamp(1.05rem,1.6vw,1.32rem);max-width:660px;opacity:0;animation:fadein .8s ease forwards 1s}
+@keyframes fadein{to{opacity:1}}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:38px;opacity:0;animation:fadein .8s ease forwards 1.2s}
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:'Sora',sans-serif;font-weight:600;font-size:1rem;padding:16px 30px;border:none;border-radius:14px;cursor:pointer;transition:transform .2s,box-shadow .25s,filter .2s;overflow:hidden;will-change:transform}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 18px 44px -14px var(--glow)}
+.btn-primary::after{content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);animation:shine 4.5s ease-in-out infinite}
+@keyframes shine{0%,60%{left:-120%}80%,100%{left:140%}}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 26px 58px -14px var(--glow);filter:brightness(1.06)}
+.btn-ghost{background:var(--surface);color:#fff;border:1px solid var(--border-strong)}
+.btn-ghost:hover{transform:translateY(-3px);background:var(--surface-2);border-color:var(--accent)}
+.hero-stats{display:flex;flex-wrap:wrap;gap:30px;margin-top:56px;padding-top:30px;border-top:1px solid var(--border);opacity:0;animation:fadein .8s ease forwards 1.4s}
+.hero-stats div{display:flex;flex-direction:column}
+.hero-stats b{font-family:'Sora',sans-serif;font-size:clamp(1.4rem,3vw,2rem);color:#fff;line-height:1}
+.hero-stats span{font-size:.8rem;color:var(--muted-2);letter-spacing:.04em;margin-top:6px}
+
+/* ---------- MARQUEE ---------- */
+.marquee{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:22px 0;overflow:hidden;white-space:nowrap;background:rgba(255,255,255,.015);-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.marquee-track{display:inline-flex;gap:0;animation:scroll 28s linear infinite;will-change:transform}
+.marquee:hover .marquee-track{animation-play-state:paused}
+.marquee-track span{font-family:'Sora',sans-serif;font-weight:700;font-size:clamp(1.3rem,3vw,2.2rem);letter-spacing:-.01em;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.28);padding:0 28px;display:inline-flex;align-items:center;gap:28px}
+.marquee-track span::after{content:"✦";-webkit-text-stroke:0;color:var(--accent)}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- DIFERENCIAIS ---------- */
+.feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:50px}
+.feat{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid var(--border);border-radius:20px;padding:30px 26px;transition:.35s;position:relative;overflow:hidden}
+.feat::before{content:"";position:absolute;inset:0;background:radial-gradient(120px 120px at var(--mx,50%) var(--my,0%),rgba(255,90,31,.18),transparent 60%);opacity:0;transition:opacity .3s}
+.feat:hover{transform:translateY(-6px);border-color:var(--border-strong)}
+.feat:hover::before{opacity:1}
+.feat .ic{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;background:linear-gradient(135deg,rgba(255,90,31,.22),rgba(255,47,176,.18));border:1px solid var(--border);margin-bottom:18px}
+.feat h3{font-size:1.18rem;margin-bottom:8px}
+.feat p{color:var(--muted);font-size:.94rem}
+
+/* ---------- TOOLS / CARDS ---------- */
+.section-head{max-width:700px;margin-bottom:46px}
+.tilt-wrap{perspective:1200px}
+.card{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));border:1px solid var(--border);padding:clamp(24px,4vw,44px);border-radius:var(--radius);max-width:var(--maxw);overflow:hidden;box-shadow:0 40px 100px -50px rgba(0,0,0,.95);transition:transform .15s ease;transform-style:preserve-3d}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),var(--magenta),transparent);opacity:.6}
+.card-glow{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(255,90,31,.22),transparent 65%);filter:blur(20px);opacity:0;transition:opacity .3s;pointer-events:none;transform:translate(-50%,-50%)}
+.card:hover .card-glow{opacity:1}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin-bottom:9px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+input,select,textarea{width:100%;padding:15px 16px;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:13px;color:#fff;font-family:inherit;font-size:.98rem;transition:.2s}
+input::placeholder,textarea::placeholder{color:var(--muted-2)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(255,90,31,.14);background:rgba(0,0,0,.55)}
+select{appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23ff8a3d' stroke-width='2'%3E%3Cpath d='M3 5l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:42px}
+select option{background:#0d0d0f;color:#fff}
+textarea{min-height:130px;resize:vertical;line-height:1.6}
+.btn-generate{width:100%;margin-top:8px}
+.resultado-wrap{margin-top:24px;animation:fadeUp .5s ease both}
+.resultado-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.resultado-head .tag{font-family:'Sora',sans-serif;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-2)}
+.resultado{padding:22px;background:rgba(0,0,0,.5);border:1px solid var(--border);border-radius:14px;white-space:pre-wrap;word-break:break-word;font-size:.92rem;line-height:1.7;color:#e9e9ec;max-height:460px;overflow:auto}
+.btn-copy{display:inline-flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:600;font-size:.85rem;padding:10px 18px;border:1px solid var(--border-strong);border-radius:11px;background:var(--surface);color:#fff;cursor:pointer;transition:.2s;white-space:nowrap}
+.btn-copy:hover{background:var(--surface-2);border-color:var(--accent)}
+.btn-copy.ok{background:rgba(46,204,113,.16);border-color:#2ecc71;color:#7ef0a8}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ---------- CONTACT ---------- */
+.contact{text-align:center}
+.contact .card{max-width:820px;margin:0 auto;text-align:center;padding:clamp(36px,6vw,70px)}
+.contact h2{font-size:clamp(2.2rem,6vw,4.4rem)}
+.contact .lead{margin:0 auto 30px}
+.contact .cta-row{justify-content:center;animation:none;opacity:1}
+
+/* ---------- FOOTER ---------- */
+footer{padding:48px clamp(18px,7vw,80px);border-top:1px solid var(--border)}
+.foot-inner{max-width:var(--maxw);margin:0 auto;display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between}
+.foot-links{display:flex;gap:20px;flex-wrap:wrap}
+.foot-links a{color:var(--muted);font-size:.9rem;transition:.2s}
+.foot-links a:hover{color:var(--accent)}
+.foot-copy{max-width:var(--maxw);margin:24px auto 0;text-align:center;color:var(--muted-2);font-size:.82rem;padding-top:22px;border-top:1px solid var(--border)}
+
+/* ---------- REVEAL ---------- */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:none}
+
+/* scrollbar */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#0a0a0b}
+::-webkit-scrollbar-thumb{background:#2a2a2e;border-radius:10px;border:2px solid #0a0a0b}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:900px){.feat-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:820px){
+  nav{position:fixed;top:0;right:0;height:100svh;width:min(82vw,330px);flex-direction:column;align-items:stretch;justify-content:center;gap:8px;background:rgba(8,8,10,.97);backdrop-filter:blur(22px);padding:90px 26px 40px;transform:translateX(106%);transition:transform .38s cubic-bezier(.4,0,.2,1);border-left:1px solid var(--border)}
+  nav.open{transform:translateX(0)}
+  nav a{padding:15px 18px;font-size:1.05rem;border:1px solid transparent}
+  nav a:hover{border-color:var(--border)}
+  nav .nav-cta{text-align:center;justify-content:center;margin-top:8px}
+  .menu-btn{display:flex;z-index:70}
+  .grid-2{grid-template-columns:1fr}
+  .cta-row .btn{flex:1 1 auto}
+  .foot-inner{flex-direction:column;align-items:flex-start}
+}
+@media (max-width:560px){
+  .feat-grid{grid-template-columns:1fr}
+  .resultado{padding:16px;font-size:.88rem}
+  .hero-stats{gap:20px}
+  .hero-stats div{flex:1 1 40%}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001s!important;animation-iteration-count:1!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+  #bg-canvas{display:none}
+}
 </style>
 </head>
 <body>
 
-<header>
-<div><strong>MARQUES LAB</strong></div>
-<nav>
-<a href="#mlvision">ML Vision IA</a>
-<a href="#ledvision">LED Vision</a>
-<a href="#contato">Contato</a>
-</nav>
+<!-- INTRO -->
+<div id="intro">
+  <div class="logo">
+    <svg class="logo-icon" viewBox="0 0 180 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Marques Lab">
+      <defs><linearGradient id="mlgI" gradientUnits="userSpaceOnUse" x1="0" y1="12" x2="0" y2="108"><stop offset="0" stop-color="#ff6a2c"/><stop offset="1" stop-color="#ff5a1f"/></linearGradient></defs>
+      <polygon points="40,12 98,12 74,56 86,56 62,108 12,108" fill="url(#mlgI)"/>
+      <polygon points="116,12 168,12 140,108 80,108 104,56 92,56" fill="url(#mlgI)"/>
+    </svg>
+    <span class="logo-text">MARQUES LAB</span>
+  </div>
+  <div class="bar"><i></i></div>
+  <div class="tagline">Laboratório de impacto visual</div>
+</div>
+
+<!-- BACKGROUND -->
+<canvas id="bg-canvas"></canvas>
+<div class="aurora"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
+<div class="fx grain"></div>
+<div class="fx vignette"></div>
+
+<!-- CURSOR -->
+<div class="cursor-ring" id="cRing"></div>
+<div class="cursor-dot" id="cDot"></div>
+
+<div class="content">
+<header id="header">
+  <a href="#top" class="brand" aria-label="Marques Lab — início">
+    <svg class="logo-icon" viewBox="0 0 180 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Marques Lab">
+      <defs><linearGradient id="mlgH" gradientUnits="userSpaceOnUse" x1="0" y1="12" x2="0" y2="108"><stop offset="0" stop-color="#ff6a2c"/><stop offset="1" stop-color="#ff5a1f"/></linearGradient></defs>
+      <polygon points="40,12 98,12 74,56 86,56 62,108 12,108" fill="url(#mlgH)"/>
+      <polygon points="116,12 168,12 140,108 80,108 104,56 92,56" fill="url(#mlgH)"/>
+    </svg>
+    <span class="logo-text">MARQUES&nbsp;LAB</span>
+  </a>
+  <button class="menu-btn" id="menuBtn" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+  <nav id="nav">
+    <a href="#mlvision">ML Vision IA</a>
+    <a href="#ledvision">LED Vision</a>
+    <a href="#diferenciais">Diferenciais</a>
+    <a href="#contato">Contato</a>
+    <a href="https://wa.me/5591991805102" target="_blank" rel="noopener" class="nav-cta">WhatsApp</a>
+  </nav>
 </header>
 
+<main id="top">
+
+<!-- HERO -->
 <section class="hero">
-<div>
-<div style="color:#ff5a1f;font-weight:700">LABORATÓRIO DE IMPACTO VISUAL</div>
-<h1>Criamos experiências visuais para artistas, eventos e marcas.</h1>
-<p>Design, Motion Graphics, Audiovisual, Visual Stage e Inteligência Artificial.</p>
-<p style="margin-top:20px">
-<a href="https://instagram.com/_marqueslab" target="_blank" style="color:white">📸 @_marqueslab</a> |
-<a href="https://wa.me/5591991805102" target="_blank" style="color:white">💬 WhatsApp</a>
-</p>
+  <div class="hero-inner">
+    <span class="kicker">Marques Lab · IA + Direção criativa</span>
+    <h1 id="heroTitle"></h1>
+    <p class="lead">Design, motion, audiovisual, visual stage e inteligência artificial combinados para criar experiências <strong style="color:#fff">surreais</strong> — que prendem o olhar e fazem o cliente decidir antes da primeira palavra.</p>
+    <div class="cta-row">
+      <a href="#ledvision" class="btn btn-primary" data-cursor>Criar meu visual agora ▸</a>
+      <a href="https://wa.me/5591991805102" target="_blank" rel="noopener" class="btn btn-ghost" data-cursor>💬 Chamar no WhatsApp</a>
+    </div>
+    <div class="hero-stats">
+      <div><b><span class="count" data-target="150">0</span>+</b><span>Projetos visuais</span></div>
+      <div><b><span class="count" data-target="98">0</span>%</b><span>Aprovação dos clientes</span></div>
+      <div><b>4K·60</b><span>Padrão de entrega (fps)</span></div>
+      <div><b>24h</b><span>Resposta no WhatsApp</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track" id="marquee">
+    <span>DESIGN</span><span>MOTION GRAPHICS</span><span>AUDIOVISUAL</span><span>VISUAL STAGE</span><span>INTELIGÊNCIA ARTIFICIAL</span><span>LED VISION</span><span>IDENTIDADE VISUAL</span><span>3D</span>
+  </div>
 </div>
+
+<!-- DIFERENCIAIS -->
+<section id="diferenciais">
+  <div class="section-head">
+    <span class="kicker reveal">Por que Marques Lab</span>
+    <h2 class="reveal">Impacto que <span class="grad">fecha negócio</span> só de olhar.</h2>
+    <p class="lead reveal">Não entregamos "arte bonita". Entregamos presença visual que para o scroll, prende o público e transforma atenção em decisão.</p>
+  </div>
+  <div class="feat-grid">
+    <div class="feat reveal" data-cursor><div class="ic">⚡</div><h3>Impacto imediato</h3><p>Visuais que param o olhar nos primeiros 3 segundos — onde a decisão acontece.</p></div>
+    <div class="feat reveal" data-cursor><div class="ic">🎬</div><h3>Padrão cinema</h3><p>Entrega em 4K a 60fps, com acabamento e direção de arte de nível cinematográfico.</p></div>
+    <div class="feat reveal" data-cursor><div class="ic">🤖</div><h3>IA + arte humana</h3><p>Tecnologia de ponta guiada por direção criativa real. O melhor dos dois mundos.</p></div>
+    <div class="feat reveal" data-cursor><div class="ic">🚀</div><h3>Entrega rápida</h3><p>Do conceito à tela sem enrolação, com resposta no WhatsApp em até 24h.</p></div>
+  </div>
 </section>
 
-<section id="mlvision" class="section">
-<h2>ML VISION IA</h2>
-<div class="card">
-<select id="tipoFoto">
-<option>DJ Profissional</option>
-<option>Artista</option>
-<option>Empresarial</option>
-<option>Luxo</option>
-<option>Futurista</option>
-</select>
-<textarea id="descricaoFoto" placeholder="Descreva sua ideia"></textarea>
-<button class="btn" onclick="gerarFoto()">Gerar Prompt</button>
-<div id="resultadoFoto" class="resultado"></div>
-</div>
+<!-- ML VISION -->
+<section id="mlvision">
+  <div class="section-head">
+    <span class="kicker reveal">ML Vision IA</span>
+    <h2 class="reveal">Retratos profissionais <span class="grad">gerados por IA</span></h2>
+    <p class="lead reveal">Escolha o estilo, descreva a ideia e gere um prompt cinematográfico pronto para as melhores ferramentas de imagem.</p>
+  </div>
+  <div class="tilt-wrap reveal">
+    <div class="card tilt" data-tilt>
+      <div class="card-glow"></div>
+      <div class="field">
+        <label for="tipoFoto">Estilo do retrato</label>
+        <select id="tipoFoto">
+          <option>DJ Profissional</option><option>Artista</option><option>Empresarial</option><option>Luxo</option><option>Futurista</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="descricaoFoto">Descreva sua ideia</label>
+        <textarea id="descricaoFoto" placeholder="Ex: homem, 30 anos, jaqueta de couro, fundo com luzes neon do club, expressão confiante..."></textarea>
+      </div>
+      <button class="btn btn-primary btn-generate" onclick="gerarFoto()" data-cursor>✨ Gerar prompt</button>
+      <div class="resultado-wrap" id="wrapFoto" hidden>
+        <div class="resultado-head"><span class="tag">Prompt gerado</span><button class="btn-copy" onclick="copiar('resultadoFoto', this)" data-cursor>📋 Copiar</button></div>
+        <div id="resultadoFoto" class="resultado"></div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<section id="ledvision" class="section">
-<h2>LED VISION</h2>
-<div class="card">
-<select id="evento">
-<option>DJ Set</option>
-<option>Festival</option>
-<option>Formatura</option>
-<option>Casamento</option>
-<option>Evento Corporativo</option>
-</select>
-
-<select id="estilo">
-<option>Futurista</option>
-<option>Cyberpunk</option>
-<option>Minimalista</option>
-<option>Luxo</option>
-<option>Cinematográfico</option>
-</select>
-
-<input id="nome" placeholder="Nome do artista ou evento">
-
-<textarea id="descricaoLed" placeholder="Descreva sua ideia"></textarea>
-
-<button class="btn" onclick="gerarLed()">Gerar Prompt</button>
-
-<div id="resultadoLed" class="resultado"></div>
-</div>
+<!-- LED VISION -->
+<section id="ledvision">
+  <div class="section-head">
+    <span class="kicker reveal">LED Vision · VJ</span>
+    <h2 class="reveal">Visuais <span class="grad">em tela cheia</span> para VJ</h2>
+    <p class="lead reveal">Prompt ultra detalhado de conteúdo full-frame pronto para o Resolume Arena — projeta direto em TV, telão de LED ou data show. Adaptado ao evento e ao estilo.</p>
+  </div>
+  <div class="tilt-wrap reveal">
+    <div class="card tilt" data-tilt>
+      <div class="card-glow"></div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="evento">Tipo de evento</label>
+          <select id="evento"><option>DJ Set</option><option>Festival</option><option>Formatura</option><option>Casamento</option><option>Evento Corporativo</option></select>
+        </div>
+        <div class="field">
+          <label for="estilo">Estilo visual</label>
+          <select id="estilo"><option>Futurista</option><option>Cyberpunk</option><option>Minimalista</option><option>Luxo</option><option>Cinematográfico</option></select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="nome">Nome do artista ou evento</label>
+        <input id="nome" placeholder="Ex: DJ NOVA / Festival Aurora 2026">
+      </div>
+      <div class="field">
+        <label for="descricaoLed">Descreva sua ideia</label>
+        <textarea id="descricaoLed" placeholder="Ex: abertura do set, logo surgindo entre partículas, transição para cidade futurista..."></textarea>
+      </div>
+      <button class="btn btn-primary btn-generate" onclick="gerarLed()" data-cursor>✨ Gerar prompt ultra detalhado</button>
+      <div class="resultado-wrap" id="wrapLed" hidden>
+        <div class="resultado-head"><span class="tag">Conteúdo VJ gerado</span><button class="btn-copy" onclick="copiar('resultadoLed', this)" data-cursor>📋 Copiar prompt</button></div>
+        <div id="resultadoLed" class="resultado"></div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<section id="contato" class="section">
-<h2>Vamos criar algo incrível?</h2>
-<a href="https://wa.me/5591991805102" style="color:#ff5a1f">Falar no WhatsApp</a>
+<!-- CONTACT -->
+<section id="contato" class="contact">
+  <div class="tilt-wrap reveal">
+    <div class="card tilt" data-tilt>
+      <div class="card-glow"></div>
+      <span class="kicker">Vamos criar?</span>
+      <h2>Seu próximo visual <span class="grad">inesquecível</span> começa aqui.</h2>
+      <p class="lead">Conte sua ideia e transformamos em um visual de impacto — do conceito à entrega em alta resolução.</p>
+      <div class="cta-row">
+        <a href="https://wa.me/5591991805102" target="_blank" rel="noopener" class="btn btn-primary" data-cursor>💬 Falar no WhatsApp</a>
+        <a href="https://instagram.com/_marqueslab" target="_blank" rel="noopener" class="btn btn-ghost" data-cursor>📸 @_marqueslab</a>
+      </div>
+    </div>
+  </div>
 </section>
+
+</main>
 
 <footer>
-Marques Lab © 2026 • @_marqueslab
+  <div class="foot-inner">
+    <div class="brand">
+      <svg class="logo-icon" viewBox="0 0 180 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Marques Lab">
+        <defs><linearGradient id="mlgF" gradientUnits="userSpaceOnUse" x1="0" y1="12" x2="0" y2="108"><stop offset="0" stop-color="#ff6a2c"/><stop offset="1" stop-color="#ff5a1f"/></linearGradient></defs>
+        <polygon points="40,12 98,12 74,56 86,56 62,108 12,108" fill="url(#mlgF)"/>
+        <polygon points="116,12 168,12 140,108 80,108 104,56 92,56" fill="url(#mlgF)"/>
+      </svg>
+      <span class="logo-text">MARQUES&nbsp;LAB</span>
+    </div>
+    <div class="foot-links">
+      <a href="#mlvision">ML Vision IA</a><a href="#ledvision">LED Vision</a><a href="#diferenciais">Diferenciais</a>
+      <a href="https://instagram.com/_marqueslab" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://wa.me/5591991805102" target="_blank" rel="noopener">WhatsApp</a>
+    </div>
+  </div>
+  <div class="foot-copy">Marques Lab © 2026 • @_marqueslab • Laboratório de impacto visual</div>
 </footer>
+</div>
 
 <script>
-function gerarFoto(){
-const tipo=document.getElementById('tipoFoto').value;
-const desc=document.getElementById('descricaoFoto').value;
-document.getElementById('resultadoFoto').innerText=
-`Retrato profissional estilo ${tipo}.
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-Descrição principal:
-${desc}
+/* ---------- INTRO ---------- */
+function hideIntro(){const i=document.getElementById('intro');if(i)i.classList.add('hide');}
+window.addEventListener('load',()=>setTimeout(hideIntro,reduce?0:1800));
+document.getElementById('intro').addEventListener('click',hideIntro);
 
-Visual premium, iluminação cinematográfica, composição moderna, alta definição, acabamento profissional, impacto visual elevado.`;
+/* ---------- HERO TITLE (word reveal) ---------- */
+(function(){
+  const parts=['Visuais','surreais','que','fecham','negócio.'];
+  const el=document.getElementById('heroTitle');
+  parts.forEach((w,i)=>{
+    const span=document.createElement('span');
+    span.className='word'+(i>=3?' grad':'');
+    span.textContent=w+' ';
+    span.style.animationDelay=(0.4+i*0.12)+'s';
+    el.appendChild(span);
+  });
+})();
+
+/* ---------- HEADER + MENU ---------- */
+const header=document.getElementById('header'),menuBtn=document.getElementById('menuBtn'),nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>header.classList.toggle('scrolled',window.scrollY>30));
+menuBtn.addEventListener('click',()=>{const o=nav.classList.toggle('open');menuBtn.classList.toggle('open',o);});
+nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');menuBtn.classList.remove('open');}));
+
+/* ---------- REVEAL ---------- */
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ---------- COUNTERS ---------- */
+const cio=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){animateCount(e.target);cio.unobserve(e.target);}});},{threshold:.6});
+document.querySelectorAll('.count').forEach(el=>cio.observe(el));
+function animateCount(el){
+  const target=+el.dataset.target,dur=1400,t0=performance.now();
+  function step(now){const p=Math.min((now-t0)/dur,1);el.textContent=Math.round(target*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
 }
 
+/* ---------- MARQUEE (duplicate for seamless loop) ---------- */
+(function(){const m=document.getElementById('marquee');m.innerHTML+=m.innerHTML;})();
+
+/* ---------- CUSTOM CURSOR ---------- */
+(function(){
+  if(window.matchMedia('(hover:none)').matches)return;
+  const dot=document.getElementById('cDot'),ring=document.getElementById('cRing');
+  let rx=0,ry=0,dx=0,dy=0;
+  window.addEventListener('mousemove',e=>{dx=e.clientX;dy=e.clientY;dot.style.left=dx+'px';dot.style.top=dy+'px';});
+  function loop(){rx+=(dx-rx)*.18;ry+=(dy-ry)*.18;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);}
+  loop();
+  document.querySelectorAll('a,button,[data-cursor],input,select,textarea').forEach(el=>{
+    el.addEventListener('mouseenter',()=>ring.classList.add('hover'));
+    el.addEventListener('mouseleave',()=>ring.classList.remove('hover'));
+  });
+})();
+
+/* ---------- 3D TILT ---------- */
+(function(){
+  if(window.matchMedia('(hover:none)').matches)return;
+  document.querySelectorAll('[data-tilt]').forEach(card=>{
+    const glow=card.querySelector('.card-glow');
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      const px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
+      card.style.transform=`rotateY(${(px-.5)*7}deg) rotateX(${(.5-py)*7}deg)`;
+      if(glow){glow.style.left=(px*r.width)+'px';glow.style.top=(py*r.height)+'px';}
+    });
+    card.addEventListener('mouseleave',()=>{card.style.transform='';});
+  });
+})();
+
+/* ---------- PARTICLE BACKGROUND ---------- */
+(function(){
+  if(reduce)return;
+  const cv=document.getElementById('bg-canvas'),ctx=cv.getContext('2d');
+  let w,h,parts=[],mouse={x:-999,y:-999};
+  function size(){w=cv.width=innerWidth;h=cv.height=innerHeight;build();}
+  function build(){
+    const count=Math.min(110,Math.floor(innerWidth*innerHeight/14000));
+    parts=Array.from({length:count},()=>({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4}));
+  }
+  window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+  window.addEventListener('mouseout',()=>{mouse.x=-999;mouse.y=-999;});
+  window.addEventListener('resize',size);
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    for(let i=0;i<parts.length;i++){
+      const p=parts[i];p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;
+      const dxm=p.x-mouse.x,dym=p.y-mouse.y,dm=Math.hypot(dxm,dym);
+      if(dm<140){const f=(140-dm)/140*1.6;p.x+=dxm/dm*f;p.y+=dym/dm*f;}
+      ctx.beginPath();ctx.arc(p.x,p.y,1.5,0,6.28);ctx.fillStyle='rgba(255,138,61,.7)';ctx.fill();
+      for(let j=i+1;j<parts.length;j++){
+        const q=parts[j],d=Math.hypot(p.x-q.x,p.y-q.y);
+        if(d<120){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle='rgba(255,90,31,'+(1-d/120)*.18+')';ctx.lineWidth=1;ctx.stroke();}
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  size();draw();
+})();
+
+/* ---------- FEAT hover glow position ---------- */
+document.querySelectorAll('.feat').forEach(f=>{
+  f.addEventListener('mousemove',e=>{const r=f.getBoundingClientRect();f.style.setProperty('--mx',(e.clientX-r.left)+'px');f.style.setProperty('--my',(e.clientY-r.top)+'px');});
+});
+
+/* ---------- COPY ---------- */
+function copiar(id,btn){
+  const txt=document.getElementById(id).innerText;
+  const done=()=>{const o=btn.dataset.label||btn.innerHTML;btn.dataset.label=o;btn.innerHTML='✓ Copiado!';btn.classList.add('ok');setTimeout(()=>{btn.innerHTML=o;btn.classList.remove('ok');},2000);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done).catch(()=>fb(txt,done));}else{fb(txt,done);}
+}
+function fb(txt,cb){const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);cb();}
+
+/* ---------- ML VISION ---------- */
+const fotoEstilos={
+  "DJ Profissional":"ambiente de club/festa, luzes de palco coloridas e fumaça, energia noturna, postura confiante e magnética",
+  "Artista":"atmosfera criativa e expressiva, iluminação dramática de estúdio, personalidade marcante e autêntica",
+  "Empresarial":"ambiente corporativo sofisticado, iluminação limpa e profissional, postura de autoridade e credibilidade",
+  "Luxo":"estética premium e exclusiva, tons dourados e profundos, texturas nobres, sensação de status e elegância",
+  "Futurista":"estética tecnológica, luzes neon ciano e magenta, elementos de holograma e cidade futurista ao fundo"
+};
+function gerarFoto(){
+  const tipo=document.getElementById('tipoFoto').value;
+  const desc=(document.getElementById('descricaoFoto').value||'').trim();
+  const ctx=fotoEstilos[tipo]||'';
+  const out=
+`🎯 RETRATO PROFISSIONAL — ESTILO ${tipo.toUpperCase()}
+
+DESCRIÇÃO PRINCIPAL:
+${desc||'(descreva a pessoa, roupa, expressão e cenário desejado)'}
+
+DIREÇÃO DE ARTE:
+${ctx}.
+
+FOTOGRAFIA:
+Retrato fotorrealista de alta definição, lente prime 85mm, abertura f/1.8 com fundo desfocado (bokeh suave), foco nítido nos olhos, enquadramento meio-corpo.
+
+ILUMINAÇÃO:
+Iluminação cinematográfica com luz principal suave, contraluz de recorte (rim light) destacando a silhueta e leve preenchimento — modelagem tridimensional do rosto.
+
+ACABAMENTO:
+Cores ricas e calibradas, pele natural com textura real, contraste profundo, nitidez profissional, composição moderna e impacto visual elevado. Qualidade de capa editorial, 4K.
+
+EVITAR (negative prompt):
+baixa resolução, rosto deformado, mãos distorcidas, pele plastificada, marca d'água, texto, ruído excessivo, iluminação chapada, aparência amadora.`;
+  document.getElementById('resultadoFoto').innerText=out;
+  document.getElementById('wrapFoto').hidden=false;
+}
+
+/* ---------- LED VISION (ULTRA DETALHADO) ---------- */
+const ledEstilos={
+  "Futurista":{paleta:"azul elétrico, ciano neon e violeta profundo com brilhos brancos intensos",elementos:"grids holográficos em perspectiva, partículas digitais flutuantes, wireframes 3D, linhas de energia e interface HUD futurista",textura:"superfícies de vidro e metal escovado com reflexos cromados",luz:"feixes de luz volumétrica e brilho de néon refletido",mood:"tecnológico, energético e visionário"},
+  "Cyberpunk":{paleta:"magenta neon, azul ciano e roxo sobre preto urbano",elementos:"letreiros neon, efeito glitch e datamosh, chuva digital, tipografia futurista e silhuetas de arranha-céus",textura:"aberração cromática, scanlines de CRT e ruído analógico",luz:"néons saturados, reflexos molhados no asfalto e contraste agressivo",mood:"rebelde, intenso e distópico"},
+  "Minimalista":{paleta:"preto absoluto com um único tom de destaque e gradientes de cinza",elementos:"formas geométricas limpas, linhas finas, muito espaço negativo e movimento sutil e preciso",textura:"superfícies foscas e planas, sem ruído",luz:"iluminação suave e difusa, sombras delicadas",mood:"sofisticado, calmo e elegante"},
+  "Luxo":{paleta:"dourado, champanhe e preto profundo com brilhos metálicos",elementos:"partículas douradas suspensas, reflexos de luz, ouro líquido, texturas de mármore e seda em movimento",textura:"ouro polido, mármore e veludo",luz:"reflexos cintilantes, glow dourado quente e contraste elegante",mood:"exclusivo, refinado e premium"},
+  "Cinematográfico":{paleta:"color grading teal & orange com contraste profundo",elementos:"lens flares anamórficos, profundidade de campo, partículas de luz e atmosfera com névoa volumétrica",textura:"granulação sutil de filme 35mm e halação suave",luz:"luz natural dramática, raios atmosféricos e silhuetas em contraluz",mood:"épico, emocional e imersivo"}
+};
+const ledEventos={
+  "DJ Set":"visuais reativos à batida, barras de equalizador, ondas sonoras pulsantes e energia eletrônica contínua que acompanha o ritmo da música",
+  "Festival":"escala épica e grandiosa, sensação de multidão e palco principal, explosões de luz e energia massiva",
+  "Formatura":"atmosfera de conquista e celebração, tom emotivo e marcante com elegância festiva",
+  "Casamento":"clima romântico e sofisticado, bokeh delicado, transições suaves e atmosfera encantadora",
+  "Evento Corporativo":"estética profissional e clean, com espaço para logomarca e mensagem institucional premium"
+};
 function gerarLed(){
-const evento=document.getElementById('evento').value;
-const estilo=document.getElementById('estilo').value;
-const nome=document.getElementById('nome').value;
-const desc=document.getElementById('descricaoLed').value;
+  const evento=document.getElementById('evento').value;
+  const estilo=document.getElementById('estilo').value;
+  const nome=(document.getElementById('nome').value||'').trim();
+  const desc=(document.getElementById('descricaoLed').value||'').trim();
+  const s=ledEstilos[estilo],ev=ledEventos[evento];
+  const linhaNome=nome?`\nNOME EM DESTAQUE:\nO nome "${nome}" integrado de forma cinematográfica e legível, com tipografia premium que combina com o estilo ${estilo} — surgindo como elemento central da composição.\n`:'';
+  const out=
+`🎬 LED VISION — CONTEÚDO VJ EM TELA CHEIA
+${estilo.toUpperCase()} · ${evento.toUpperCase()}
+(Pronto para Resolume Arena / VJ — exibir em TV, telão de LED ou data show)
 
-document.getElementById('resultadoLed').innerText=
-`Loop visual para painel de LED.
+⚠️ FORMATO (LEIA PRIMEIRO):
+O resultado É o próprio visual, em TELA CHEIA (full frame), preenchendo todo o quadro de borda a borda. NÃO gere uma cena mostrando um telão, TV, monitor, projetor, palco, moldura ou "tela dentro da tela" — a imagem já sai pronta para ser projetada/exibida.
 
-Evento: ${evento}
-Nome principal: ${nome}
-Estilo visual: ${estilo}
+CONCEITO:
+Visual em primeiro plano no estilo ${estilo}, para ${evento}. ${ev}.
 
-Descrição:
-${desc}
+DESCRIÇÃO DO CLIENTE:
+${desc||'(descreva a cena, a ação principal e o clima desejado)'}
+${linhaNome}
+PALETA DE CORES:
+${s.paleta}.
 
-Animação contínua para telão 16:9, elementos visuais premium, profundidade cinematográfica, movimento fluido, alto contraste, qualidade profissional para eventos e shows.`;
+ELEMENTOS VISUAIS (preenchendo a tela):
+${s.elementos}, ocupando todo o quadro em camadas com profundidade e parallax.
+
+TEXTURA & MATERIAL:
+${s.textura}.
+
+ILUMINAÇÃO:
+${s.luz}, com iluminação volumétrica e alto contraste.
+
+ATMOSFERA / MOOD:
+${s.mood}.
+
+CÂMERA & MOVIMENTO:
+Movimento fluido e constante (push-in lento, parallax e leve flutuação), transições suaves e contínuas, ritmo hipnótico em loop perfeito (seamless) sem corte perceptível.
+
+ESPECIFICAÇÕES TÉCNICAS (Resolume Arena / VJ):
+• Conteúdo em tela cheia (full frame / full bleed) — sem bordas, sem molduras
+• Fundo preto puro (#000000) para mesclar com blend modes Add/Screen no Resolume Arena
+• Proporção 16:9 — Full HD 1920×1080 (adaptável: 4K 3840×2160 e ultrawide 32:9 para LED)
+• 30 ou 60 fps, movimento ultra fluido
+• Loop perfeito (seamless loop), duração 8–15s
+• Alto contraste e cores vivas, calibradas para TV, telão de LED e data show
+• Pronto para projeção e mixagem ao vivo em software de VJ
+
+EVITAR (negative prompt):
+telão, TV, monitor, projetor, tela dentro da tela, palco, moldura, bordas, mockup, maquete, cenário ao redor da tela, plateia assistindo, baixa resolução, imagem tremida, corte visível no loop, texto distorcido ou ilegível, marca d'água, ruído, cores queimadas, distorções e artefatos.`;
+  document.getElementById('resultadoLed').innerText=out;
+  document.getElementById('wrapLed').hidden=false;
 }
 </script>
 
