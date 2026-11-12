@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { portfolioCategories, type Project } from "@/lib/portfolio";
-import { ConceptCover } from "@/components/ui/ConceptCover";
+import type { Project } from "@/lib/portfolio";
+import { Cover } from "@/components/ui/Cover";
 import { cn } from "@/lib/utils/cn";
 
-const filters = ["Todos", ...portfolioCategories] as const;
+type Props = { projects: Project[]; categories: string[] };
 
-export function PortfolioGrid({ projects }: { projects: Project[] }) {
-  const [active, setActive] = useState<(typeof filters)[number]>("Todos");
+export function PortfolioGrid({ projects, categories }: Props) {
+  const filters = ["Todos", ...categories];
+  const [active, setActive] = useState("Todos");
   const visible = active === "Todos" ? projects : projects.filter((p) => p.category === active);
 
   return (
@@ -42,8 +43,10 @@ export function PortfolioGrid({ projects }: { projects: Project[] }) {
           {visible.map((p, i) => (
             <li key={p.slug} className={cn(i % 3 === 0 ? "md:col-span-4" : "md:col-span-2")}>
               <Link href={`/portfolio/${p.slug}`} className="group block">
-                <ConceptCover
+                <Cover
+                  url={p.coverUrl}
                   label={p.category}
+                  alt={p.title}
                   demo={p.demo}
                   className={cn(
                     "transition-transform duration-500 group-hover:-translate-y-1",

@@ -7,26 +7,33 @@ export const portfolioCategories = [
   "Eventos",
   "Marketing",
   "Tecnologia",
-] as const;
+];
 
-export type PortfolioCategory = (typeof portfolioCategories)[number];
+export type Media = { kind: "image" | "video"; url: string; caption?: string };
 
 export type Project = {
   slug: string;
   title: string;
-  category: PortfolioCategory;
+  category: string;
   description: string;
   process: string;
   result: string;
+  coverUrl?: string;
+  videoUrl?: string;
+  clientName?: string;
+  featured?: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
+  media?: Media[];
   /** Projetos de demonstração são conceituais e não representam trabalhos reais. */
   demo: boolean;
 };
 
 /**
- * Espaços de demonstração. Substitua por projetos reais pelo painel (Sprint 04/05).
+ * Espaços de demonstração, usados apenas quando o Supabase não está configurado.
  * Nada aqui representa cliente, resultado ou trabalho entregue.
  */
-export const projects: Project[] = [
+export const demoProjects: Project[] = [
   {
     slug: "demo-identidade-visual",
     title: "Espaço para identidade visual",
@@ -65,5 +72,3 @@ export const projects: Project[] = [
     demo: true,
   },
 ];
-
-export const getProject = (slug: string) => projects.find((p) => p.slug === slug);

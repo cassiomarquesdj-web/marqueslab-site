@@ -1,19 +1,19 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "./env";
 
+/** Cliente com a sessão do usuário (cookies). Retorna null se o Supabase não está configurado. */
 export async function createClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) throw new Error("Supabase não configurado: defina as variáveis em .env.local");
+  if (!isSupabaseConfigured()) return null;
   const store = await cookies();
-  return createServerClient(url, key, {
+  return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll: () => store.getAll(),
       setAll: (list) => {
         try {
           list.forEach(({ name, value, options }) => store.set(name, value, options));
         } catch {
-          // Chamado de Server Component: a renovação da sessão fica a cargo do middleware.
+          // Chamado de Server Component: o proxy renova a sessão.
         }
       },
     },

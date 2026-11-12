@@ -1,9 +1,12 @@
-import { hasWhatsapp, waLink } from "@/lib/contact";
+import { buildWaLink } from "@/lib/contact";
 
 /** Só é renderizado quando o número do WhatsApp está configurado. */
-export function WhatsAppFloat() {
-  const href = waLink("Olá! Vim pelo site do Marques Lab e gostaria de falar sobre um projeto.");
-  if (!hasWhatsapp || !href) return null;
+export function WhatsAppFloat({ number }: { number: string }) {
+  const href = buildWaLink(
+    number,
+    "Olá! Vim pelo site do Marques Lab e gostaria de falar sobre um projeto.",
+  );
+  if (!href) return null;
   return (
     <a
       href={href}

@@ -8,7 +8,7 @@ import { nav } from "@/lib/site";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/Button";
 
-export function Header() {
+export function Header({ logoUrl }: { logoUrl?: string }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -50,7 +50,14 @@ export function Header() {
             onClick={() => setOpen(false)}
             className="font-display text-lg font-bold tracking-tight"
           >
-            MARQUES<span className="text-flame">LAB</span>
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt="Marques Lab" className="h-7 w-auto" />
+            ) : (
+              <>
+                MARQUES<span className="text-flame">LAB</span>
+              </>
+            )}
           </Link>
 
           <nav

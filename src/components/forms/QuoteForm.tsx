@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { leadCategories, leadSchema, type LeadInput } from "@/schemas/lead";
-import { hasWhatsapp, waLink } from "@/lib/contact";
-import { cn } from "@/lib/utils/cn";
+import { MAX_FILES, MAX_FILE_BYTES, validateFiles } from "@/lib/uploads";
+import { buildWaLink } from "@/lib/contact";
 
 type Status =
   | { kind: "idle" }
@@ -15,9 +15,14 @@ type Status =
 
 const field =
   "bg-ink-2 w-full border border-white/15 px-4 py-3 text-white placeholder:text-white/30 focus:border-flame focus:outline-none";
+const label = "mb-2 block font-mono text-xs tracking-widest uppercase";
 
-export function QuoteForm({ defaultCategory }: { defaultCategory?: string }) {
+type Props = { defaultCategory?: string; whatsapp: string };
+
+export function QuoteForm({ defaultCategory, whatsapp }: Props) {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const [files, setFiles] = useState<File[]>([]);
+  const [fileError, setFileError] = useState<string | null>(null);
   const initial = leadCategories.find((c) => c === defaultCategory);
   const {
     register,
@@ -29,15 +34,21 @@ export function QuoteForm({ defaultCategory }: { defaultCategory?: string }) {
     defaultValues: initial ? { category: initial } : undefined,
   });
 
+  const onFiles = (list: FileList | null) => {
+    const picked = Array.from(list ?? []);
+    const problem = validateFiles(picked);
+    setFileError(problem);
+    setFiles(problem ? [] : picked);
+  };
+
   const onSubmit = async (data: LeadInput) => {
     setStatus({ kind: "sending" });
     try {
-      const res = await fetch("/api/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const json = (await res.json()) as { protocol?: string; error?: string };
+      const body = new FormData();
+      Object.entries(data).forEach(([k, v]) => v != null && body.append(k, String(v)));
+      files.forEach((f) => body.append("references", f));
+      const res = await fetch("/api/leads", { method: "POST", body });
+      const json = (await res.json()) as { protocol?: string };
       if (res.ok && json.protocol) setStatus({ kind: "done", protocol: json.protocol });
       else
         setStatus({
@@ -45,7 +56,9 @@ export function QuoteForm({ defaultCategory }: { defaultCategory?: string }) {
           message:
             res.status === 503
               ? "O recebimento de orçamentos pelo site ainda não está ativo."
-              : "Não foi possível enviar agora. Tente novamente.",
+              : res.status === 429
+                ? "Muitas tentativas. Aguarde alguns minutos."
+                : "Não foi possível enviar agora. Tente novamente.",
         });
     } catch {
       setStatus({ kind: "error", message: "Sem conexão. Tente novamente." });
@@ -53,7 +66,10 @@ export function QuoteForm({ defaultCategory }: { defaultCategory?: string }) {
   };
 
   if (status.kind === "done") {
-    const link = waLink(`Olá! Enviei um orçamento pelo site. Protocolo ${status.protocol}.`);
+    const link = buildWaLink(
+      whatsapp,
+      `Olá! Enviei um orçamento pelo site. Protocolo ${status.protocol}.`,
+    );
     return (
       <div role="status" className="border-flame/50 border p-8">
         <p className="text-flame font-mono text-xs tracking-widest uppercase">
@@ -86,28 +102,27 @@ export function QuoteForm({ defaultCategory }: { defaultCategory?: string }) {
     "aria-describedby": errors[k] ? `${k}-erro` : undefined,
   });
 
-  const whatsappFallback = () => {
-    const v = getValues();
-    return waLink(
-      `Olá! Gostaria de um orçamento.\nNome: ${v.name}\nServiço: ${v.category}\nProjeto: ${v.description}`,
-    );
-  };
+  const fallbackHref =
+    status.kind === "error"
+      ? buildWaLink(
+          whatsapp,
+          `Olá! Gostaria de um orçamento.\nNome: ${getValues("name")}\nServiço: ${getValues("category")}\nProjeto: ${getValues("description")}`,
+        )
+      : null;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="grid gap-5 sm:grid-cols-2">
       <label className="block">
-        <span className="mb-2 block font-mono text-xs tracking-widest uppercase">Nome</span>
+        <span className={label}>Nome</span>
         <input className={field} autoComplete="name" {...aria("name")} {...register("name")} />
         {err("name")}
       </label>
       <label className="block">
-        <span className="mb-2 block font-mono text-xs tracking-widest uppercase">
-          Empresa ou marca
-        </span>
+        <span className={label}>Empresa ou marca</span>
         <input className={field} autoComplete="organization" {...register("company")} />
       </label>
       <label className="block">
-        <span className="mb-2 block font-mono text-xs tracking-widest uppercase">WhatsApp</span>
+        <span className={label}>WhatsApp</span>
         <input
           className={field}
           type="tel"
@@ -119,7 +134,7 @@ export function QuoteForm({ defaultCategory }: { defaultCategory?: string }) {
         {err("whatsapp")}
       </label>
       <label className="block">
-        <span className="mb-2 block font-mono text-xs tracking-widest uppercase">E-mail</span>
+        <span className={label}>E-mail</span>
         <input
           className={field}
           type="email"
@@ -130,9 +145,7 @@ export function QuoteForm({ defaultCategory }: { defaultCategory?: string }) {
         {err("email")}
       </label>
       <label className="block sm:col-span-2">
-        <span className="mb-2 block font-mono text-xs tracking-widest uppercase">
-          Serviço desejado
-        </span>
+        <span className={label}>Serviço desejado</span>
         <select
           className={field}
           defaultValue={initial ?? ""}
@@ -151,9 +164,7 @@ export function QuoteForm({ defaultCategory }: { defaultCategory?: string }) {
         {err("category")}
       </label>
       <label className="block sm:col-span-2">
-        <span className="mb-2 block font-mono text-xs tracking-widest uppercase">
-          Descrição do projeto
-        </span>
+        <span className={label}>Descrição do projeto</span>
         <textarea
           rows={5}
           className={field}
@@ -163,14 +174,27 @@ export function QuoteForm({ defaultCategory }: { defaultCategory?: string }) {
         {err("description")}
       </label>
       <label className="block">
-        <span className="mb-2 block font-mono text-xs tracking-widest uppercase">Prazo</span>
+        <span className={label}>Prazo</span>
         <input className={field} placeholder="Ex.: evento em 15/12" {...register("deadline")} />
       </label>
       <label className="block">
-        <span className="mb-2 block font-mono text-xs tracking-widest uppercase">
-          Faixa de investimento (opcional)
-        </span>
+        <span className={label}>Faixa de investimento (opcional)</span>
         <input className={field} {...register("budget")} />
+      </label>
+      <label className="block sm:col-span-2">
+        <span className={label}>Referências (opcional)</span>
+        <input
+          type="file"
+          multiple
+          accept="image/png,image/jpeg,image/webp,application/pdf"
+          onChange={(e) => onFiles(e.target.files)}
+          aria-describedby="refs-ajuda"
+          className="text-steel file:bg-ink-3 file:mr-4 file:border-0 file:px-4 file:py-2 file:text-white"
+        />
+        <p id="refs-ajuda" className="text-steel mt-1 text-sm">
+          Até {MAX_FILES} arquivos (PNG, JPG, WebP ou PDF) de {MAX_FILE_BYTES / 1024 / 1024} MB.
+        </p>
+        {fileError && <p className="mt-1 text-sm text-red-400">{fileError}</p>}
       </label>
 
       {/* isca anti-robô */}
@@ -182,19 +206,17 @@ export function QuoteForm({ defaultCategory }: { defaultCategory?: string }) {
         <button
           type="submit"
           disabled={status.kind === "sending"}
-          className={cn(
-            "bg-flame text-ink hover:bg-flame-soft w-full px-7 py-4 font-mono text-xs font-medium tracking-[0.18em] uppercase transition-colors disabled:opacity-60 sm:w-fit",
-          )}
+          className="bg-flame text-ink hover:bg-flame-soft w-full px-7 py-4 font-mono text-xs font-medium tracking-[0.18em] uppercase transition-colors disabled:opacity-60 sm:w-fit"
         >
           {status.kind === "sending" ? "Enviando…" : "Solicitar um orçamento"}
         </button>
         {status.kind === "error" && (
           <p role="alert" className="text-red-400">
             {status.message}{" "}
-            {hasWhatsapp && (
+            {fallbackHref && (
               <a
                 className="text-flame-soft underline"
-                href={whatsappFallback() ?? "#"}
+                href={fallbackHref}
                 target="_blank"
                 rel="noopener noreferrer"
               >

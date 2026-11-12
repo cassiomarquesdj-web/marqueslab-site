@@ -1,8 +1,6 @@
-import { site } from "@/lib/site";
-
-const digits = site.whatsapp.replace(/\D/g, "");
-
-export const hasWhatsapp = digits.length >= 10;
-
-export const waLink = (message: string) =>
-  hasWhatsapp ? `https://wa.me/${digits}?text=${encodeURIComponent(message)}` : null;
+/** Monta o link wa.me a partir do número configurado; null se não houver número válido. */
+export function buildWaLink(number: string, message: string): string | null {
+  const digits = number.replace(/\D/g, "");
+  if (digits.length < 10) return null;
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+}

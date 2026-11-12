@@ -1,16 +1,30 @@
+import type { Media } from "./portfolio";
+
 export type ProductStatus =
   "Em desenvolvimento" | "Em testes" | "Disponível" | "Em evolução" | "Experimental";
+
+/** Chaves do enum `product_status` no banco → rótulos exibidos. */
+export const productStatusLabels: Record<string, ProductStatus> = {
+  em_desenvolvimento: "Em desenvolvimento",
+  em_testes: "Em testes",
+  disponivel: "Disponível",
+  em_evolucao: "Em evolução",
+  experimental: "Experimental",
+};
 
 export type Product = {
   slug: string;
   name: string;
   status: ProductStatus;
   summary: string;
+  description?: string;
   features: string[];
+  coverUrl?: string;
+  media?: Media[];
 };
 
-/** Status refletem o que se sabe hoje; ajuste conforme cada projeto evolui. */
-export const products: Product[] = [
+/** Conteúdo inicial (também gravado no seed). Status refletem o que se sabe hoje. */
+export const staticProducts: Product[] = [
   {
     slug: "infinite-studio",
     name: "Marques Lab Infinite Studio",
@@ -55,5 +69,3 @@ export const products: Product[] = [
     features: ["Criação de clipes", "Edição"],
   },
 ];
-
-export const getProduct = (slug: string) => products.find((p) => p.slug === slug);
