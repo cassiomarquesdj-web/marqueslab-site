@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Hero3D } from "@/components/hero/Hero3D";
 import { Reveal } from "@/components/animations/Reveal";
@@ -60,15 +61,18 @@ export default function Home() {
           </Reveal>
           <ol className="mt-16 border-t border-white/10">
             {departments.map((d, i) => (
-              <li key={d.id}>
+              <li key={d.slug}>
                 <Reveal delay={i * 0.04}>
-                  <div className="group grid gap-3 border-b border-white/10 py-8 transition-colors hover:bg-white/[0.02] md:grid-cols-[6rem_1fr_1.2fr] md:items-baseline">
+                  <Link
+                    href={`/servicos/${d.slug}`}
+                    className="group grid gap-3 border-b border-white/10 py-8 transition-colors hover:bg-white/[0.02] md:grid-cols-[6rem_1fr_1.2fr] md:items-baseline"
+                  >
                     <span className="text-steel group-hover:text-flame font-mono text-xs tracking-widest transition-colors">
                       DEP. 0{i + 1}
                     </span>
                     <h3 className="font-display text-2xl font-bold uppercase">{d.name}</h3>
                     <p className="text-steel">{d.summary}</p>
-                  </div>
+                  </Link>
                 </Reveal>
               </li>
             ))}
