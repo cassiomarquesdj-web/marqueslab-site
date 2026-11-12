@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { leadCategories, leadSchema, type LeadInput } from "@/schemas/lead";
-import { MAX_FILES, MAX_FILE_BYTES, validateFiles } from "@/lib/uploads";
+import { MAX_FILES, MAX_TOTAL_BYTES, validateFiles } from "@/lib/uploads";
 import { buildWaLink } from "@/lib/contact";
 
 type Status =
@@ -192,7 +192,8 @@ export function QuoteForm({ defaultCategory, whatsapp }: Props) {
           className="text-steel file:bg-ink-3 file:mr-4 file:border-0 file:px-4 file:py-2 file:text-white"
         />
         <p id="refs-ajuda" className="text-steel mt-1 text-sm">
-          Até {MAX_FILES} arquivos (PNG, JPG, WebP ou PDF) de {MAX_FILE_BYTES / 1024 / 1024} MB.
+          Até {MAX_FILES} arquivos (PNG, JPG, WebP ou PDF), somando até{" "}
+          {MAX_TOTAL_BYTES / 1024 / 1024} MB.
         </p>
         {fileError && <p className="mt-1 text-sm text-red-400">{fileError}</p>}
       </label>

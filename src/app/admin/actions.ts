@@ -32,17 +32,15 @@ export async function logout() {
 }
 
 // ───────────── CRUD genérico ─────────────
-const MAX_IMAGE_BYTES = 25 * 1024 * 1024;
-const MEDIA_TYPES = [
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-  "image/svg+xml",
-  "image/gif",
-  "image/x-icon",
-  "video/mp4",
-  "video/webm",
-];
+// A Vercel limita o corpo de requisições de funções a ~4,5 MB, então 4 MB é o teto prático.
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
+const IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif", "image/x-icon"];
+const VIDEO_TYPES = ["video/mp4", "video/webm"];
+
+/** SVG fica de fora (next/image não o otimiza e ele pode carregar scripts); vídeo só nos campos de mídia. */
+const uploadAllowed = (file: File, fieldName: string) =>
+  file.size <= MAX_UPLOAD_BYTES &&
+  (IMAGE_TYPES.includes(file.type) || (fieldName === "url" && VIDEO_TYPES.includes(file.type)));
 
 export async function saveResource(key: string, id: string | null, formData: FormData) {
   const resource = getResource(key);
@@ -64,8 +62,10 @@ export async function saveResource(key: string, id: string | null, formData: For
     if (f.type !== "image") continue;
     const file = formData.get(f.name);
     if (file instanceof File && file.size > 0) {
-      if (file.size > MAX_IMAGE_BYTES || !MEDIA_TYPES.includes(file.type))
-        return back(target, { erro: `Arquivo inválido em “${f.label}”.` });
+      if (!uploadAllowed(file, f.name))
+        return back(target, {
+          erro: `Arquivo inválido em “${f.label}” (imagem PNG/JPG/WebP/GIF de até 4 MB).`,
+        });
       const path = `${resource.table}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-60)}`;
       const { error: upErr } = await s.supabase.storage
         .from("media")
@@ -183,7 +183,7 @@ export async function saveSettings(formData: FormData) {
     if (key === "logo_url" || key === "favicon_url") {
       const file = formData.get(`${key}__file`);
       if (file instanceof File && file.size > 0) {
-        if (file.size > MAX_IMAGE_BYTES || !MEDIA_TYPES.includes(file.type))
+        if (!uploadAllowed(file, key))
           return back("/admin/configuracoes", { erro: "Arquivo inválido." });
         const path = `settings/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-60)}`;
         const { error } = await s.supabase.storage

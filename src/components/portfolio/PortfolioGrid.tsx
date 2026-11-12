@@ -53,9 +53,9 @@ export function PortfolioGrid({ projects, categories }: Props) {
                     i % 3 === 0 ? "aspect-[16/9]" : "aspect-[4/5]",
                   )}
                 />
-                <h3 className="font-display group-hover:text-flame-soft mt-4 text-xl font-bold uppercase transition-colors">
+                <h2 className="font-display group-hover:text-flame-soft mt-4 text-xl font-bold uppercase transition-colors">
                   {p.title}
-                </h3>
+                </h2>
                 <p className="text-steel mt-1 text-sm">{p.description}</p>
               </Link>
             </li>

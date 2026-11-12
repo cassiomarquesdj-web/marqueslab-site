@@ -65,7 +65,8 @@ Nenhuma mensagem automática é enviada; o visitante pode continuar pelo WhatsAp
 
 ## O que preencher / decidir
 
-- `NEXT_PUBLIC_WHATSAPP_NUMBER` ou **Configurações → WhatsApp** (sem número, o botão flutuante não aparece).
+- WhatsApp: o padrão é o número do site antigo; altere em **Configurações → WhatsApp** ou `NEXT_PUBLIC_WHATSAPP_NUMBER`.
+- Uploads: limite de 4 MB por arquivo/total (teto de corpo de requisição da Vercel). Veja `docs/AUDITORIA.md`.
 - E-mail comercial, informações da empresa, logo e favicon em **Configurações**.
 - ID do Google Analytics (`G-…`) em **Configurações**. O painel não consulta a API do Analytics: o dashboard apenas indica se a medição está ativa.
 - Projetos reais em **Projetos** (os de demonstração aparecem só sem Supabase). Depoimentos não existem no modelo de dados: só devem ser adicionados com autorização real.

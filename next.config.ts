@@ -15,6 +15,8 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Uploads do painel passam por Server Actions (padrão: 1 MB). 4 MB = teto prático na Vercel.
+  experimental: { serverActions: { bodySizeLimit: "4mb" } },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: supabaseHost

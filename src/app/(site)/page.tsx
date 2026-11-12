@@ -115,7 +115,61 @@ export default async function Home() {
         </section>
       )}
 
+      <section className="px-4 py-28 sm:px-8">
+        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2">
+          <Reveal>
+            <p className="text-flame font-mono text-xs tracking-[0.25em] uppercase">
+              Experiências audiovisuais
+            </p>
+            <h2 className="font-display mt-4 text-4xl font-bold uppercase sm:text-5xl">
+              Palcos e telas que viram experiência.
+            </h2>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <p className="text-steel text-lg">
+              Loops para painéis LED, conteúdo para VJ, aberturas cinematográficas, vídeos de
+              divulgação e captação de eventos: da criação à finalização, tudo no mesmo laboratório.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Button href="/servicos/led-visual-experiencias" variant="ghost">
+                LED Visual & Experiências
+              </Button>
+              <Button href="/servicos/audiovisual-producao" variant="ghost">
+                Audiovisual & Produção
+              </Button>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       <section className="bg-ink-2 px-4 py-28 sm:px-8">
+        <div className="mx-auto max-w-7xl">
+          <Reveal>
+            <p className="text-flame font-mono text-xs tracking-[0.25em] uppercase">Diferenciais</p>
+          </Reveal>
+          <dl className="mt-12 grid gap-px border border-white/10 bg-white/10 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              [
+                "Estúdio multidisciplinar",
+                "Design, motion, vídeo, eventos, marketing e tecnologia sob a mesma direção.",
+              ],
+              ["Da ideia à entrega", "Criamos e finalizamos: o material chega pronto para uso."],
+              [
+                "Tecnologia própria",
+                "Também desenvolvemos software e ferramentas para produção criativa.",
+              ],
+              ["Qualquer porte", "De eventos populares a grandes produções."],
+            ].map(([t, d]) => (
+              <div key={t} className="bg-ink-2 p-8">
+                <dt className="font-display text-lg font-bold uppercase">{t}</dt>
+                <dd className="text-steel mt-3 text-sm">{d}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      <section className="px-4 py-28 sm:px-8">
         <div className="mx-auto max-w-7xl">
           <Reveal>
             <p className="text-flame font-mono text-xs tracking-[0.25em] uppercase">

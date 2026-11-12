@@ -32,8 +32,26 @@ export function Hero3D() {
   const [mode, setMode] = useState<Mode>(null);
 
   useEffect(() => {
-    const id = requestAnimationFrame(() => setMode(detect()));
-    return () => cancelAnimationFrame(id);
+    // A cena 3D (three.js) é pesada. Em celular ou aparelho modesto ela só carrega depois da
+    // primeira interação (o SVG estático é a versão simplificada); no desktop, com o navegador ocioso.
+    const run = () => setMode(detect());
+    if (detect().simplified) {
+      const events = ["pointerdown", "touchstart", "keydown", "scroll"] as const;
+      const start = () => {
+        events.forEach((e) => window.removeEventListener(e, start));
+        run();
+      };
+      events.forEach((e) => window.addEventListener(e, start, { passive: true, once: true }));
+      return () => events.forEach((e) => window.removeEventListener(e, start));
+    }
+    // Safari não implementa requestIdleCallback: o tipo do TS o considera sempre presente.
+    const w = window as Window & { requestIdleCallback?: Window["requestIdleCallback"] };
+    if (w.requestIdleCallback) {
+      const id = w.requestIdleCallback(run, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(run, 1500);
+    return () => window.clearTimeout(id);
   }, []);
 
   return (

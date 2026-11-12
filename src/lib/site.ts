@@ -4,7 +4,8 @@ export const site = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://marqueslab.com.br",
   instagram: "https://instagram.com/_marqueslab",
   instagramHandle: "@_marqueslab",
-  whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "",
+  // Padrão: número que já constava no site antigo (legacy/index.html). Configurável no painel.
+  whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5591991805102",
   email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "",
 } as const;
 
