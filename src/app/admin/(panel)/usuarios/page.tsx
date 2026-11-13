@@ -2,7 +2,8 @@ import { inviteUser, updateUser } from "@/app/admin/actions";
 import { requireRole } from "@/lib/admin/auth";
 import { roleLabels, type Role } from "@/lib/admin/resources";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { Notice, PageTitle, inputCls, submitCls } from "@/components/admin/ui";
+import { Notice, PageTitle, inputCls } from "@/components/admin/ui";
+import { SubmitButton } from "@/components/admin/SubmitButton";
 
 type Props = { searchParams: Promise<{ erro?: string; salvo?: string }> };
 
@@ -59,7 +60,7 @@ export default async function UsersPage({ searchParams }: Props) {
                 />
                 Ativo
               </label>
-              <button className={submitCls}>Salvar</button>
+              <SubmitButton>Salvar</SubmitButton>
             </form>
           </li>
         ))}
@@ -88,7 +89,7 @@ export default async function UsersPage({ searchParams }: Props) {
               </option>
             ))}
           </select>
-          <button className={submitCls}>Enviar convite</button>
+          <SubmitButton pendingLabel="Enviando…">Enviar convite</SubmitButton>
         </form>
       ) : (
         <p className="text-steel mt-4 text-sm">

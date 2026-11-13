@@ -1,4 +1,6 @@
-import { inputCls, submitCls } from "@/components/admin/ui";
+import { inputCls } from "@/components/admin/ui";
+import { MediaUpload } from "@/components/admin/MediaUpload";
+import { SubmitButton } from "@/components/admin/SubmitButton";
 import type { Field, Resource } from "@/lib/admin/resources";
 
 type Props = {
@@ -10,11 +12,13 @@ type Props = {
 };
 
 function Input({
+  resourceKey,
   field,
   value,
   options,
   disabled,
 }: {
+  resourceKey: string;
   field: Field;
   value: unknown;
   options: { value: string; label: string }[];
@@ -80,20 +84,14 @@ function Input({
       );
     case "image":
       return (
-        <div className="space-y-2">
-          {str && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={str} alt="" className="bg-ink-3 h-24 w-auto border border-white/10" />
-          )}
-          <input type="hidden" name={`${field.name}__current`} value={str} />
-          <input
-            id={id}
-            name={field.name}
-            type="file"
-            accept="image/*,video/mp4,video/webm"
-            className="text-steel file:bg-ink-3 file:mr-3 file:border-0 file:px-3 file:py-2 file:text-white"
-          />
-        </div>
+        <MediaUpload
+          inputName={`${field.name}__current`}
+          resourceKey={resourceKey}
+          fieldName={field.name}
+          current={str}
+          allowVideo={field.name === "url"}
+          label={field.label}
+        />
       );
     default:
       return <input {...common} type={field.type === "url" ? "url" : "text"} defaultValue={str} />;
@@ -106,7 +104,13 @@ export function ResourceForm({ resource, action, values, isCreate, relationOptio
       {resource.fields.map((f) => (
         <div key={f.name} className={f.type === "boolean" ? "flex items-center gap-3" : ""}>
           {f.type === "boolean" && (
-            <Input field={f} value={values[f.name]} options={[]} disabled={false} />
+            <Input
+              resourceKey={resource.key}
+              field={f}
+              value={values[f.name]}
+              options={[]}
+              disabled={false}
+            />
           )}
           <label
             htmlFor={`f-${f.name}`}
@@ -117,6 +121,7 @@ export function ResourceForm({ resource, action, values, isCreate, relationOptio
           </label>
           {f.type !== "boolean" && (
             <Input
+              resourceKey={resource.key}
               field={f}
               value={values[f.name]}
               options={relationOptions[f.name] ?? f.options ?? []}
@@ -126,9 +131,7 @@ export function ResourceForm({ resource, action, values, isCreate, relationOptio
           {f.help && f.type !== "boolean" && <p className="text-steel mt-1 text-xs">{f.help}</p>}
         </div>
       ))}
-      <button type="submit" className={submitCls}>
-        Salvar
-      </button>
+      <SubmitButton>Salvar</SubmitButton>
     </form>
   );
 }

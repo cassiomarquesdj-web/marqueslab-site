@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { login } from "@/app/admin/actions";
 import { getAdminSession } from "@/lib/admin/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { inputCls, submitCls } from "@/components/admin/ui";
+import { inputCls } from "@/components/admin/ui";
+import { SubmitButton } from "@/components/admin/SubmitButton";
 
 type Props = { searchParams: Promise<{ erro?: string }> };
 
@@ -31,7 +32,11 @@ export default async function LoginPage({ searchParams }: Props) {
                 role="alert"
                 className="border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300"
               >
-                {erro === "credenciais" ? "E-mail ou senha incorretos." : "Configuração inválida."}
+                {erro === "credenciais"
+                  ? "E-mail ou senha incorretos."
+                  : erro === "limite"
+                    ? "Muitas tentativas. Aguarde alguns minutos."
+                    : "Configuração inválida."}
               </p>
             )}
             <label className="block">
@@ -58,9 +63,9 @@ export default async function LoginPage({ searchParams }: Props) {
                 className={inputCls}
               />
             </label>
-            <button type="submit" className={`${submitCls} w-full`}>
+            <SubmitButton pendingLabel="Entrando…" className="w-full">
               Entrar
-            </button>
+            </SubmitButton>
           </form>
         )}
       </div>

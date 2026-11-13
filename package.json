@@ -11,10 +11,11 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "db:check": "node scripts/check-migrations.mjs",
-    "db:seed": "node scripts/generate-seed.mts"
+    "db:seed": "node scripts/generate-seed.mts",
+    "verify:supabase": "node --env-file=.env.local scripts/verify-supabase.mjs"
   },
   "engines": {
-    "node": ">=20.9"
+    "node": "22.x"
   },
   "dependencies": {
     "@hookform/resolvers": "^7.0.6",

@@ -13,6 +13,7 @@ export function buildPayload(
   resource: Resource,
   get: Get,
   isCreate: boolean,
+  opts: { mediaPrefix?: string } = {},
 ): { payload: Record<string, unknown>; error?: string } {
   const payload: Record<string, unknown> = {};
   const text = (n: string) => {
@@ -64,6 +65,10 @@ export function buildPayload(
       }
       case "image": {
         const current = text(`${f.name}__current`);
+        // Só aceita arquivos do nosso bucket de mídia (impede URLs arbitrárias nos campos de imagem).
+        if (current && (!opts.mediaPrefix || !current.startsWith(opts.mediaPrefix))) {
+          return { payload, error: `Arquivo inválido em “${f.label}”. Envie novamente.` };
+        }
         value = current || null;
         break;
       }

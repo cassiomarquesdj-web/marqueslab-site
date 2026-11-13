@@ -1,6 +1,21 @@
 "use client";
 
+import { useFormStatus } from "react-dom";
+
 type Props = { action: () => Promise<void>; label?: string };
+
+function Inner({ label }: { label: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="font-mono text-xs tracking-widest text-red-400 uppercase hover:underline disabled:opacity-60"
+    >
+      {pending ? "Excluindo…" : label}
+    </button>
+  );
+}
 
 export function DeleteButton({ action, label = "Excluir" }: Props) {
   return (
@@ -11,12 +26,7 @@ export function DeleteButton({ action, label = "Excluir" }: Props) {
           e.preventDefault();
       }}
     >
-      <button
-        type="submit"
-        className="font-mono text-xs tracking-widest text-red-400 uppercase hover:underline"
-      >
-        {label}
-      </button>
+      <Inner label={label} />
     </form>
   );
 }

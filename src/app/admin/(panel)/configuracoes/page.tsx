@@ -1,6 +1,8 @@
 import { saveSettings } from "@/app/admin/actions";
 import { requireRole } from "@/lib/admin/auth";
-import { Notice, PageTitle, inputCls, submitCls } from "@/components/admin/ui";
+import { Notice, PageTitle, inputCls } from "@/components/admin/ui";
+import { MediaUpload } from "@/components/admin/MediaUpload";
+import { SubmitButton } from "@/components/admin/SubmitButton";
 
 type Props = { searchParams: Promise<{ erro?: string; salvo?: string }> };
 
@@ -55,24 +57,14 @@ export default async function SettingsPage({ searchParams }: Props) {
                 className={inputCls}
               />
             ) : f.type === "image" ? (
-              <div className="space-y-2">
-                {values[f.key] && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={values[f.key]}
-                    alt=""
-                    className="bg-ink-3 h-16 w-auto border border-white/10"
-                  />
-                )}
-                <input type="hidden" name={f.key} value={values[f.key] ?? ""} />
-                <input
-                  id={f.key}
-                  type="file"
-                  name={`${f.key}__file`}
-                  accept="image/*"
-                  className="text-steel file:bg-ink-3 file:mr-3 file:border-0 file:px-3 file:py-2 file:text-white"
-                />
-              </div>
+              <MediaUpload
+                inputName={f.key}
+                resourceKey="configuracoes"
+                fieldName={f.key}
+                current={values[f.key] ?? ""}
+                allowVideo={false}
+                label={f.label}
+              />
             ) : (
               <input
                 id={f.key}
@@ -84,7 +76,7 @@ export default async function SettingsPage({ searchParams }: Props) {
             {f.help && <p className="text-steel mt-1 text-xs">{f.help}</p>}
           </div>
         ))}
-        <button className={submitCls}>Salvar</button>
+        <SubmitButton>Salvar</SubmitButton>
       </form>
     </>
   );

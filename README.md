@@ -22,7 +22,7 @@ e o formulário de orçamento informa que o recebimento ainda não está ativo.
 ## Conectando o Supabase
 
 1. Crie um projeto em supabase.com.
-2. No **SQL Editor**, rode em ordem: `supabase/migrations/0001_init.sql`, `0002_project_client_name.sql` e depois `supabase/seed.sql`
+2. No **SQL Editor**, rode em ordem: `supabase/migrations/0001_init.sql`, `0002_project_client_name.sql`, `0003_storage_limits_and_privacy.sql` e depois `supabase/seed.sql`
    (ou use `supabase db push` com a CLI).
 3. Em **Authentication → Providers → Email**, **desative o cadastro público** (“Allow new users to sign up”).
 4. Crie o primeiro usuário em **Authentication → Users → Add user** (e-mail + senha). **O primeiro usuário vira administrador**;
@@ -55,7 +55,14 @@ Nenhuma mensagem automática é enviada; o visitante pode continuar pelo WhatsAp
 | `npm run dev` / `build` / `start` | desenvolvimento / build / produção |
 | `npm run typecheck` · `lint` · `test` | verificações |
 | `npm run db:check` | valida migrações, seed e políticas RLS em um Postgres em memória (PGlite) |
+| `npm run verify:supabase` | teste de integração contra um Supabase **de homologação** (exige `HOMOLOG_CONFIRM=sim`) |
 | `npm run db:seed` | regenera `supabase/seed.sql` a partir do conteúdo em `src/lib` |
+
+## Documentação
+
+- [`docs/DEPLOY.md`](docs/DEPLOY.md) — configuração completa (Supabase, Vercel, variáveis, segurança, publicação, rollback)
+- [`docs/HOMOLOGACAO.md`](docs/HOMOLOGACAO.md) — checklist de homologação
+- [`docs/AUDITORIA.md`](docs/AUDITORIA.md) — auditorias técnicas e o que ainda impede o lançamento
 
 ## Deploy (Vercel)
 
@@ -66,7 +73,7 @@ Nenhuma mensagem automática é enviada; o visitante pode continuar pelo WhatsAp
 ## O que preencher / decidir
 
 - WhatsApp: o padrão é o número do site antigo; altere em **Configurações → WhatsApp** ou `NEXT_PUBLIC_WHATSAPP_NUMBER`.
-- Uploads: limite de 4 MB por arquivo/total (teto de corpo de requisição da Vercel). Veja `docs/AUDITORIA.md`.
+- Uploads do painel vão direto ao Supabase Storage (imagens até 10 MB, vídeos até 50 MB); anexos do formulário público: até 4 MB no total.
 - E-mail comercial, informações da empresa, logo e favicon em **Configurações**.
 - ID do Google Analytics (`G-…`) em **Configurações**. O painel não consulta a API do Analytics: o dashboard apenas indica se a medição está ativa.
 - Projetos reais em **Projetos** (os de demonstração aparecem só sem Supabase). Depoimentos não existem no modelo de dados: só devem ser adicionados com autorização real.

@@ -4,7 +4,8 @@ import { createClientFromLead, updateLead } from "@/app/admin/actions";
 import { requireRole } from "@/lib/admin/auth";
 import { leadStatusLabel, leadStatuses } from "@/lib/admin/resources";
 import { buildWaLink } from "@/lib/contact";
-import { AdminButton, inputCls, Notice, PageTitle, submitCls } from "@/components/admin/ui";
+import { AdminButton, inputCls, Notice, PageTitle } from "@/components/admin/ui";
+import { SubmitButton } from "@/components/admin/SubmitButton";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -114,7 +115,7 @@ export default async function LeadDetailPage({ params, searchParams }: Props) {
                 className={inputCls}
               />
             </label>
-            <button className={submitCls}>Salvar</button>
+            <SubmitButton>Salvar</SubmitButton>
           </form>
 
           <div className="mt-8">

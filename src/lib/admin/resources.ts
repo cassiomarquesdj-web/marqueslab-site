@@ -90,7 +90,7 @@ export const resources: Resource[] = [
         name: "client_id",
         label: "Cliente (interno)",
         type: "relation",
-        relation: { table: "clients", label: "name" },
+        relation: { table: "client_options", label: "name" },
       },
       {
         name: "client_name",

@@ -1,8 +1,7 @@
 import type { NextConfig } from "next";
 
-const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
-  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
-  : null;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseHost = supabaseUrl ? new URL(supabaseUrl).hostname : null;
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -12,11 +11,33 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
 ];
 
+/**
+ * CSP em modo Report-Only: o navegador registra violações (console e /api/csp-report) sem bloquear.
+ * 'unsafe-inline' em script/style é necessário hoje (scripts inline do Next e do GA, estilos do
+ * framework). Depois de homologar sem violações inesperadas, migrar para nonce e trocar o cabeçalho
+ * para `Content-Security-Policy`. Veja docs/DEPLOY.md.
+ */
+const cspReportOnly = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
+  "style-src 'self' 'unsafe-inline'",
+  `img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com${supabaseHost ? ` https://${supabaseHost}` : ""}`,
+  `media-src 'self' blob:${supabaseHost ? ` https://${supabaseHost}` : ""}`,
+  `connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com${supabaseHost ? ` https://${supabaseHost} wss://${supabaseHost}` : ""}`,
+  "font-src 'self' data:",
+  "worker-src 'self' blob:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  "report-uri /api/csp-report",
+].join("; ");
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  // Uploads do painel passam por Server Actions (padrão: 1 MB). 4 MB = teto prático na Vercel.
-  experimental: { serverActions: { bodySizeLimit: "4mb" } },
+  // Server Actions só levam formulários pequenos: uploads grandes vão direto ao Storage.
+  experimental: { serverActions: { bodySizeLimit: "2mb" } },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: supabaseHost
@@ -24,7 +45,15 @@ const nextConfig: NextConfig = {
       : [],
   },
   async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }];
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          ...securityHeaders,
+          { key: "Content-Security-Policy-Report-Only", value: cspReportOnly },
+        ],
+      },
+    ];
   },
 };
 

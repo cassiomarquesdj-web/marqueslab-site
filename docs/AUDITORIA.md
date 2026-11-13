@@ -137,3 +137,67 @@ Perdas/diferenças a decidir (não são bugs):
 **Qualidade**
 - [ ] Lighthouse (Preview) ≥ 90 em Performance e ≥ 95 em A11y/Boas práticas/SEO nas páginas principais.
 - [ ] Sem erros no console. Sem segredo no HTML/JS (`SUPABASE_SERVICE_ROLE_KEY` ausente do bundle).
+
+---
+
+# Rodada 2 — Preparação da homologação
+
+Escopo: Supabase real, painel, uploads diretos, Vercel Preview, segurança e documentação.
+**Nenhum Supabase real estava disponível** (sem credenciais e sem Docker), então a validação foi dividida em
+*o que foi efetivamente executado* e *o que depende de credenciais*.
+
+## 8. O que foi efetivamente testado (executado nesta rodada)
+
+| Camada | Como | Resultado |
+| --- | --- | --- |
+| SQL (migrações 0001–0003 + seed) | PGlite (Postgres real em memória) com stubs de `auth`/`storage` | executa sem erro |
+| **Matriz RLS** (admin × editor × comercial × anônimo) | `npm run db:check` | **97/97** |
+| — escrita por tabela (11 tabelas × 4 papéis) | inserts permitidos/negados | ✅ |
+| — escalonamento de privilégio | editor/comercial não alteram o próprio papel; usuário desativado perde acesso | ✅ |
+| — orçamentos | protocolo `ML-######`, histórico automático com autor, validações do banco, vínculo com cliente, `set null` ao excluir cliente | ✅ |
+| — clientes | editor **não** lê e-mail/telefone (só `client_options`) | ✅ |
+| — visibilidade pública | rascunho/inativo/despublicado ocultos; configurações legíveis | ✅ |
+| — Storage (políticas e limites) | editor/admin enviam e excluem em `media`; comercial/anônimo não; `lead-references` só comercial/admin leem; limites e tipos dos buckets (SVG proibido) | ✅ |
+| — log de atividades | imutável; não registra em nome de outro | ✅ |
+| Testes unitários (Vitest) | `npm test` | **30/30** (payload, CSV, mídia, limites, URLs, rate limit, permissões) |
+| TypeScript / ESLint / `next build` | `npm run typecheck`, `lint`, `build` | 0 erros |
+| Site em produção local (`next start`) | navegador + curl | CSP Report-Only presente; `/api/csp-report` → 204; `/admin` → 307 para login; `/admin/export/leads` sem sessão → 401; hero 3D carrega; 0 violações de CSP após carregar a cena |
+| Formulário de orçamento (sem Supabase) | navegador | validação por campo, isca, 422/503 conforme esperado |
+| Scripts | `node --check`, guardas de `verify-supabase.mjs` (recusa sem `HOMOLOG_CONFIRM=sim` e sem credenciais) | ✅ |
+
+## 9. Mudanças desta rodada
+
+| Área | Mudança |
+| --- | --- |
+| Banco | **0003**: `file_size_limit` + `allowed_mime_types` nos buckets (o Storage recusa mesmo se o navegador mentir); remove a leitura de `clients` pelo editor e cria a view `client_options` (id+nome) |
+| Upload | **upload direto** por URL assinada (`createUploadUrl` → `uploadToSignedUrl`): vídeos até 50 MB sem passar pela Vercel; valida papel, campo, tipo e tamanho; URLs de imagem só aceitas se do bucket `media` do projeto |
+| Storage | arquivos substituídos/removidos/excluídos (inclusive mídias filhas de projetos/produtos) são **apagados** do bucket |
+| Painel | `SubmitButton` com “Salvando…” e bloqueio de duplo clique em todos os formulários; `loading.tsx` e `error.tsx`; exclusão com confirmação e estado “Excluindo…”; mensagens de login (credenciais/limite) |
+| Segurança | **CSP Report-Only** + `/api/csp-report`; limite de tentativas de login; Server Actions limitadas a 2 MB (uploads não passam por elas) |
+| Vercel | `vercel.json` (`framework: nextjs`), `engines.node = 22.x`, `.nvmrc` |
+| Verificação | `scripts/verify-supabase.mjs` (39 checagens contra Supabase real, com limpeza e trava de segurança); `db:check` ampliado de 11 para 97 |
+| Docs | `docs/DEPLOY.md`, `docs/HOMOLOGACAO.md` |
+
+## 10. Depende de credenciais / ambiente externo (NÃO executado)
+
+| Item | Por quê não foi possível | Como validar |
+| --- | --- | --- |
+| Login real, sessão por cookie, redirecionamentos do Supabase Auth | exige projeto Supabase | `HOMOLOGACAO.md` B |
+| `verify:supabase` (39 checagens) | exige URL, anon key e service role de **homologação** | `HOMOLOG_CONFIRM=sim npm run verify:supabase` |
+| CRUD/upload/exclusão **pela interface** do painel | exige sessão real | `HOMOLOGACAO.md` C–D |
+| Fluxo real do formulário → `leads` → painel | exige service role | `HOMOLOGACAO.md` E |
+| Exportação CSV (download) | exige sessão no navegador (a formatação está testada) | `HOMOLOGACAO.md` E |
+| Convite de usuário por e-mail | exige SMTP | `HOMOLOGACAO.md` F |
+| Build e Preview na **Vercel** (preset, Output Directory, Node, variáveis) | sem acesso à conta | `DEPLOY.md` §4 |
+| Violações reais de CSP com Supabase/GA ativos | os hosts só entram na política com `NEXT_PUBLIC_SUPABASE_URL` definida | navegar o Preview com o console aberto |
+| Lighthouse com conteúdo real do Supabase | idem | `HOMOLOGACAO.md` I |
+
+## 11. O que ainda impede o lançamento
+
+1. **Homologação com Supabase real não executada** (itens da seção 10). É o bloqueio principal: até lá, o painel e a gravação de orçamentos são código revisado e testado em partes, não validado de ponta a ponta.
+2. **Configuração da Vercel não verificada** (preset/Output Directory herdados do site estático; variáveis do ambiente).
+3. **SMTP** do Supabase para convites (sem ele o convite por e-mail é limitado/instável).
+4. **CSP ainda em Report-Only**; falta rodar a homologação para promovê-la.
+5. **Limitação de requisições em memória** (melhor esforço); recomendável Firewall/Rate Limiting da Vercel ou Upstash antes de divulgar o formulário.
+6. **Decisões de negócio**: retratos/ensaio com IA (serviço do site antigo), depoimentos reais, história da empresa, confirmar o WhatsApp padrão.
+7. Anexos do formulário público limitados a 4 MB.

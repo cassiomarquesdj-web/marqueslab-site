@@ -1,22 +1,31 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { logActivity, requireRole } from "@/lib/admin/auth";
+import { getAdminSession, logActivity, requireRole, type AdminSession } from "@/lib/admin/auth";
 import { buildPayload } from "@/lib/admin/payload";
-import { getResource, leadStatuses, type Role } from "@/lib/admin/resources";
+import { getResource, leadStatuses, type Resource, type Role } from "@/lib/admin/resources";
+import { mediaPathFromUrl, mediaPublicPrefix, safeFileName, validateMedia } from "@/lib/media";
+import { rateLimit } from "@/lib/rate-limit";
 
 const back = (path: string, params: Record<string, string>) =>
   redirect(`${path}?${new URLSearchParams(params)}`);
 
 const publicRefresh = () => revalidatePath("/", "layout");
+const prefix = () => mediaPublicPrefix(process.env.NEXT_PUBLIC_SUPABASE_URL);
 
 // ───────────── sessão ─────────────
 export async function login(formData: FormData) {
   const supabase = await createClient();
   if (!supabase) return back("/admin/login", { erro: "config" });
+
+  // Limite por IP contra tentativa de senhas (o Supabase também aplica limites próprios).
+  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anon";
+  if (!rateLimit(`login:${ip}`, 8, 10 * 60 * 1000)) return back("/admin/login", { erro: "limite" });
+
   const { error } = await supabase.auth.signInWithPassword({
     email: String(formData.get("email") ?? "").trim(),
     password: String(formData.get("password") ?? ""),
@@ -31,17 +40,60 @@ export async function logout() {
   redirect("/admin/login");
 }
 
+// ───────────── upload direto (URL assinada) ─────────────
+type UploadUrl = { ok: true; path: string; token: string } | { ok: false; error: string };
+
+/**
+ * Autoriza um upload direto do navegador ao Supabase Storage (o arquivo não passa pelo servidor,
+ * então não esbarra no limite de 4,5 MB da Vercel). Valida papel, campo, tipo e tamanho;
+ * o bucket repete essas regras (migração 0003).
+ */
+export async function createUploadUrl(
+  resourceKey: string,
+  fieldName: string,
+  fileName: string,
+  size: number,
+  type: string,
+): Promise<UploadUrl> {
+  const s = await getAdminSession();
+  if (!s) return { ok: false, error: "Sessão expirada. Entre novamente." };
+
+  let folder: string;
+  let allowVideo: boolean;
+  if (resourceKey === "configuracoes") {
+    if (s.role !== "admin" || !["logo_url", "favicon_url"].includes(fieldName))
+      return { ok: false, error: "Sem permissão." };
+    folder = "settings";
+    allowVideo = false;
+  } else {
+    const resource = getResource(resourceKey);
+    const field = resource?.fields.find((f) => f.name === fieldName && f.type === "image");
+    if (!resource || !field || !resource.roles.includes(s.role))
+      return { ok: false, error: "Sem permissão." };
+    folder = resource.table;
+    allowVideo = fieldName === "url";
+  }
+
+  const problem = validateMedia({ size, type }, allowVideo);
+  if (problem) return { ok: false, error: problem };
+
+  const path = `${folder}/${crypto.randomUUID()}-${safeFileName(fileName)}`;
+  const { data, error } = await s.supabase.storage.from("media").createSignedUploadUrl(path);
+  if (error || !data) return { ok: false, error: "Não foi possível iniciar o envio." };
+  return { ok: true, path, token: data.token };
+}
+
+/** Remove do Storage os arquivos (URLs públicas do bucket media) que deixaram de ser usados. */
+async function removeMedia(s: AdminSession, urls: (unknown | null | undefined)[]) {
+  const paths = urls
+    .map((u) => (typeof u === "string" ? mediaPathFromUrl(u, prefix()) : null))
+    .filter((p): p is string => !!p);
+  if (paths.length) await s.supabase.storage.from("media").remove(paths);
+}
+
+const imageFields = (r: Resource) => r.fields.filter((f) => f.type === "image").map((f) => f.name);
+
 // ───────────── CRUD genérico ─────────────
-// A Vercel limita o corpo de requisições de funções a ~4,5 MB, então 4 MB é o teto prático.
-const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
-const IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif", "image/x-icon"];
-const VIDEO_TYPES = ["video/mp4", "video/webm"];
-
-/** SVG fica de fora (next/image não o otimiza e ele pode carregar scripts); vídeo só nos campos de mídia. */
-const uploadAllowed = (file: File, fieldName: string) =>
-  file.size <= MAX_UPLOAD_BYTES &&
-  (IMAGE_TYPES.includes(file.type) || (fieldName === "url" && VIDEO_TYPES.includes(file.type)));
-
 export async function saveResource(key: string, id: string | null, formData: FormData) {
   const resource = getResource(key);
   if (!resource) redirect("/admin");
@@ -55,42 +107,31 @@ export async function saveResource(key: string, id: string | null, formData: For
       if (typeof v === "string" && v) keep.set(f.name, v);
     }
 
-  const { payload, error } = buildPayload(resource, (n) => formData.get(n), !id);
+  const { payload, error } = buildPayload(resource, (n) => formData.get(n), !id, {
+    mediaPrefix: prefix(),
+  });
   if (error) return back(target, { erro: error, ...Object.fromEntries(keep) });
+  for (const f of resource.fields)
+    if (f.type === "image" && f.required && !payload[f.name])
+      return back(target, { erro: `Envie “${f.label}”.`, ...Object.fromEntries(keep) });
 
-  for (const f of resource.fields) {
-    if (f.type !== "image") continue;
-    const file = formData.get(f.name);
-    if (file instanceof File && file.size > 0) {
-      if (!uploadAllowed(file, f.name))
-        return back(target, {
-          erro: `Arquivo inválido em “${f.label}” (imagem PNG/JPG/WebP/GIF de até 4 MB).`,
-        });
-      const path = `${resource.table}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-60)}`;
-      const { error: upErr } = await s.supabase.storage
-        .from("media")
-        .upload(path, await file.arrayBuffer(), { contentType: file.type });
-      if (upErr) return back(target, { erro: "Falha no upload do arquivo." });
-      payload[f.name] = s.supabase.storage.from("media").getPublicUrl(path).data.publicUrl;
-    }
-    if (f.required && !payload[f.name]) return back(target, { erro: `Envie “${f.label}”.` });
+  // valores anteriores: para saber se publicou antes e quais arquivos foram substituídos
+  let previous: Record<string, unknown> | null = null;
+  if (id) {
+    const cols = [...imageFields(resource), "id"];
+    if (resource.table === "projects" || resource.table === "articles") cols.push("published_at");
+    const { data } = await s.supabase
+      .from(resource.table)
+      .select(cols.join(","))
+      .eq("id", id)
+      .maybeSingle();
+    previous = (data as unknown as Record<string, unknown>) ?? null;
   }
 
-  if (resource.publish) {
+  if (resource.publish && (resource.table === "projects" || resource.table === "articles")) {
     const { field, kind } = resource.publish;
     const published = kind === "status" ? payload[field] === "published" : payload[field] === true;
-    if (resource.table === "projects" || resource.table === "articles") {
-      let hadDate = false;
-      if (id) {
-        const { data } = await s.supabase
-          .from(resource.table)
-          .select("published_at")
-          .eq("id", id)
-          .maybeSingle();
-        hadDate = !!data?.published_at;
-      }
-      if (published && !hadDate) payload.published_at = new Date().toISOString();
-    }
+    if (published && !previous?.published_at) payload.published_at = new Date().toISOString();
   }
 
   const query = id
@@ -105,6 +146,14 @@ export async function saveResource(key: string, id: string | null, formData: For
     return back(target, { erro: msg, ...Object.fromEntries(keep) });
   }
 
+  if (previous)
+    await removeMedia(
+      s,
+      imageFields(resource)
+        .filter((n) => previous![n] && previous![n] !== payload[n])
+        .map((n) => previous![n]),
+    );
+
   await logActivity(s, id ? "update" : "create", resource.table, data.id, {
     title: String(payload[resource.titleField] ?? ""),
   });
@@ -117,8 +166,30 @@ export async function deleteResource(key: string, id: string) {
   const resource = getResource(key);
   if (!resource) redirect("/admin");
   const s = await requireRole(resource.roles);
+
+  // arquivos do registro e dos filhos (que o banco apaga em cascata) ficariam órfãos no Storage
+  const urls: unknown[] = [];
+  const own = imageFields(resource);
+  if (own.length) {
+    const { data } = await s.supabase
+      .from(resource.table)
+      .select(own.join(","))
+      .eq("id", id)
+      .maybeSingle();
+    if (data) urls.push(...Object.values(data as unknown as Record<string, unknown>));
+  }
+  for (const rel of resource.related ?? []) {
+    const child = getResource(rel.resource);
+    const cols = child ? imageFields(child) : [];
+    if (!child || !cols.length) continue;
+    const { data } = await s.supabase.from(child.table).select(cols.join(",")).eq(rel.fk, id);
+    for (const row of (data ?? []) as unknown as Record<string, unknown>[])
+      urls.push(...Object.values(row));
+  }
+
   const { error } = await s.supabase.from(resource.table).delete().eq("id", id);
   if (error) return back(`/admin/${key}`, { erro: "Não foi possível excluir." });
+  await removeMedia(s, urls);
   await logActivity(s, "delete", resource.table, id);
   publicRefresh();
   redirect(`/admin/${key}?excluido=1`);
@@ -175,28 +246,30 @@ export async function saveSettings(formData: FormData) {
   const s = await requireRole(["admin"]);
   const rows: { key: string; value: string }[] = [];
   for (const key of SETTING_KEYS) {
-    let value = String(formData.get(key) ?? "").trim();
+    const value = String(formData.get(key) ?? "").trim();
     if (key === "analytics_id" && value && !/^G-[A-Z0-9]+$/.test(value))
       return back("/admin/configuracoes", {
         erro: "O ID do Google Analytics deve ter o formato G-XXXXXXXXXX.",
       });
-    if (key === "logo_url" || key === "favicon_url") {
-      const file = formData.get(`${key}__file`);
-      if (file instanceof File && file.size > 0) {
-        if (!uploadAllowed(file, key))
-          return back("/admin/configuracoes", { erro: "Arquivo inválido." });
-        const path = `settings/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-60)}`;
-        const { error } = await s.supabase.storage
-          .from("media")
-          .upload(path, await file.arrayBuffer(), { contentType: file.type });
-        if (error) return back("/admin/configuracoes", { erro: "Falha no upload." });
-        value = s.supabase.storage.from("media").getPublicUrl(path).data.publicUrl;
-      }
-    }
+    if (key === "instagram" && value && !/^https?:\/\//.test(value))
+      return back("/admin/configuracoes", { erro: "O Instagram deve ser uma URL http(s)." });
+    if ((key === "logo_url" || key === "favicon_url") && value && !value.startsWith(prefix()))
+      return back("/admin/configuracoes", { erro: "Arquivo inválido. Envie novamente." });
     rows.push({ key, value });
   }
+
+  const { data: old } = await s.supabase
+    .from("site_settings")
+    .select("key,value")
+    .in("key", ["logo_url", "favicon_url"]);
   const { error } = await s.supabase.from("site_settings").upsert(rows);
   if (error) return back("/admin/configuracoes", { erro: "Não foi possível salvar." });
+
+  const next = Object.fromEntries(rows.map((r) => [r.key, r.value]));
+  await removeMedia(
+    s,
+    (old ?? []).filter((o) => o.value && o.value !== next[o.key]).map((o) => o.value),
+  );
   await logActivity(s, "update", "site_settings", null);
   publicRefresh();
   redirect("/admin/configuracoes?salvo=1");
