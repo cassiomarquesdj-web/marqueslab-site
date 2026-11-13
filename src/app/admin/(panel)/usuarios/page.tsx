@@ -4,6 +4,7 @@ import { roleLabels, type Role } from "@/lib/admin/resources";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Notice, PageTitle, inputCls } from "@/components/admin/ui";
 import { SubmitButton } from "@/components/admin/SubmitButton";
+import { InviteForm } from "@/components/admin/SimpleForms";
 
 type Props = { searchParams: Promise<{ erro?: string; salvo?: string }> };
 
@@ -68,29 +69,13 @@ export default async function UsersPage({ searchParams }: Props) {
 
       <h2 className="font-display mt-12 text-xl font-bold uppercase">Convidar usuário</h2>
       {admin ? (
-        <form action={inviteUser} className="mt-4 flex max-w-xl flex-wrap gap-3">
-          <input
-            name="email"
-            type="email"
-            required
-            placeholder="E-mail"
-            aria-label="E-mail"
-            className={`${inputCls} flex-1`}
-          />
-          <select
-            name="role"
-            className={`${inputCls} w-auto`}
-            aria-label="Papel"
-            defaultValue="editor"
-          >
-            {(Object.keys(roleLabels) as Role[]).map((r) => (
-              <option key={r} value={r}>
-                {roleLabels[r]}
-              </option>
-            ))}
-          </select>
-          <SubmitButton pendingLabel="Enviando…">Enviar convite</SubmitButton>
-        </form>
+        <InviteForm
+          action={inviteUser}
+          roles={(Object.keys(roleLabels) as Role[]).map((r) => ({
+            value: r,
+            label: roleLabels[r],
+          }))}
+        />
       ) : (
         <p className="text-steel mt-4 text-sm">
           Defina <code>SUPABASE_SERVICE_ROLE_KEY</code> no servidor para convidar usuários por

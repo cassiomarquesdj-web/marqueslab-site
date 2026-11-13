@@ -29,7 +29,8 @@ Eu não tenho (e não devo ter) acesso às suas contas. Para fechar a homologaç
    2. `supabase/migrations/0002_project_client_name.sql`
    3. `supabase/migrations/0003_storage_limits_and_privacy.sql` — limites/tipos dos buckets e privacidade de clientes
    4. `supabase/migrations/0004_new_users_inactive.sql` — **novos usuários nascem inativos** (só o primeiro vira admin ativo); protege contra cadastro público
-   5. `supabase/seed.sql` — departamentos, produtos, categorias, banner e configurações iniciais (idempotente)
+   5. `supabase/migrations/0005_lead_idempotency.sql` — chave de idempotência dos orçamentos (reenvio sem duplicar)
+   6. `supabase/seed.sql` — departamentos, produtos, categorias, banner e configurações iniciais (idempotente)
 3. **Authentication → Providers → Email**: desative **“Allow new users to sign up”** (só o admin cria/convida usuários).
    Mantenha “Confirm email” ligado.
 4. **Authentication → URL Configuration**: *Site URL* = URL do Preview (ou do domínio final) e, em *Redirect URLs*, a URL do Preview
@@ -114,6 +115,9 @@ Passos:
 5. Se o build falhar, abra os *Build Logs*; o erro mais provável é preset/Output Directory herdados do site estático.
 
 Se você me der acesso de leitura (ou colar os *Build Logs* e a tela de Settings), eu confirmo cada item acima.
+
+### Limpeza de arquivos órfãos
+`npm run cleanup:orphans` lista (simulação) arquivos do Storage que nenhum registro usa; `-- --apply` apaga; só considera arquivos com mais de 24 h (`--min-age-hours=N`). Agende, por exemplo, uma vez por dia.
 
 ## 5. Segurança
 

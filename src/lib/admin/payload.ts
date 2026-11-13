@@ -14,7 +14,7 @@ export function buildPayload(
   get: Get,
   isCreate: boolean,
   opts: { mediaPrefix?: string } = {},
-): { payload: Record<string, unknown>; error?: string } {
+): { payload: Record<string, unknown>; error?: string; field?: string } {
   const payload: Record<string, unknown> = {};
   const text = (n: string) => {
     const v = get(n);
@@ -37,7 +37,7 @@ export function buildPayload(
       case "select": {
         const v = text(f.name) || f.options?.[0]?.value || "";
         if (f.options && !f.options.some((o) => o.value === v)) {
-          return { payload, error: `Valor inválido em “${f.label}”.` };
+          return { payload, field: f.name, error: `Valor inválido em “${f.label}”.` };
         }
         value = v;
         break;
@@ -59,7 +59,11 @@ export function buildPayload(
           if (!Array.isArray(parsed)) throw new Error("not array");
           value = parsed;
         } catch {
-          return { payload, error: `“${f.label}” precisa ser uma lista JSON válida.` };
+          return {
+            payload,
+            field: f.name,
+            error: `“${f.label}” precisa ser uma lista JSON válida.`,
+          };
         }
         break;
       }
@@ -67,7 +71,11 @@ export function buildPayload(
         const current = text(`${f.name}__current`);
         // Só aceita arquivos do nosso bucket de mídia (impede URLs arbitrárias nos campos de imagem).
         if (current && (!opts.mediaPrefix || !current.startsWith(opts.mediaPrefix))) {
-          return { payload, error: `Arquivo inválido em “${f.label}”. Envie novamente.` };
+          return {
+            payload,
+            field: f.name,
+            error: `Arquivo inválido em “${f.label}”. Envie novamente.`,
+          };
         }
         value = current || null;
         break;
@@ -77,18 +85,22 @@ export function buildPayload(
         if (f.name === "slug") {
           if (!v && f.slugFrom) v = slugify(text(f.slugFrom));
           else v = slugify(v);
-          if (!SLUG_RE.test(v)) return { payload, error: "Informe um slug válido." };
+          if (!SLUG_RE.test(v)) return { payload, field: f.name, error: "Informe um slug válido." };
         }
         value = v === "" ? null : v;
         if (f.type === "url" && typeof value === "string" && !/^https?:\/\//.test(value)) {
-          return { payload, error: `“${f.label}” precisa começar com http:// ou https://.` };
+          return {
+            payload,
+            field: f.name,
+            error: `“${f.label}” precisa começar com http:// ou https://.`,
+          };
         }
       }
     }
 
     if (f.required && (value === null || value === "")) {
       // imagens obrigatórias podem ser satisfeitas pelo upload; o chamador revalida.
-      if (f.type !== "image") return { payload, error: `Preencha “${f.label}”.` };
+      if (f.type !== "image") return { payload, field: f.name, error: `Preencha “${f.label}”.` };
     }
     payload[f.name] = value;
   }

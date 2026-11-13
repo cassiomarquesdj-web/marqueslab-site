@@ -1,3 +1,63 @@
+# Persistência dos dados dos formulários — resultado (Supabase real)
+
+**Objetivo:** nenhum usuário perde o que digitou por erro de validação, falha de conexão ou erro do servidor.
+**Como foi testado:** formulário público no navegador isolado e painel no Chrome do administrador; falhas simuladas com interceptação do `fetch` (conexão, 500, 422) e **resposta perdida de verdade** (o servidor grava, a resposta some). Dados de teste “HOMOLOGAÇÃO” removidos ao final.
+
+## Formulário público de orçamento (`/contato`)
+| Teste | Resultado | Evidência |
+| --- | --- | --- |
+| Campo obrigatório vazio | ✅ | 4 mensagens junto dos campos (nome, WhatsApp, e-mail, descrição) e os 4 campos destacados em vermelho; serviço pré-selecionado mantido |
+| E-mail inválido | ✅ | “Informe um e-mail válido” ao lado do campo; o resto do formulário mantido |
+| Telefone inválido | ✅ | “Informe um WhatsApp válido com DDD…”; aceita `(91) 99999-9999`, `91999999999`, `+55 91 99999-9999`, fixo; recusa 3 e 14 dígitos |
+| Correção dos campos após erro | ✅ | corrigir e-mail/telefone mantém nome, empresa, prazo, descrição e anexos; erros somem ao corrigir |
+| Anexo com formato não permitido | ✅ | “\"programa.exe\": formato não permitido…” **sem perder** os anexos válidos já escolhidos; também recusa duplicado, passar de 5 arquivos ou de 4 MB, e permite remover um a um |
+| Falha de conexão | ✅ | mensagem “Sem conexão… Seus dados foram mantidos”; todos os campos e o anexo continuam; botão vira “Tentar enviar novamente” |
+| Erro 500 | ✅ | “O servidor teve um problema… Seus dados foram mantidos”; nada apagado |
+| Servidor aponta um campo (422) | ✅ | mensagem junto do campo, campo destacado e **foco** nele |
+| **Resposta perdida** (servidor gravou, navegador não soube) | ✅ | o reenvio devolve o **mesmo protocolo (ML-000010)**; no banco: **1** orçamento, **1** anexo, histórico `created` |
+| Duplo/triplo clique | ✅ | 3 cliques → **1** requisição; botão desabilitado e “Enviando…” |
+| Envio bem-sucedido | ✅ | protocolo exibido; só então o formulário sai da tela; “Enviar outro orçamento” zera tudo e gera nova chave |
+| Revalidação no servidor | ✅ | e-mail/telefone adulterados, `.exe`, chave malformada e nome > 120 caracteres → 422 com `fields`; **0** orçamentos criados |
+| Aviso ao sair com dados preenchidos | ✅ | `beforeunload` enquanto houver dados não enviados |
+| Anexos e recarga da página | ℹ️ | o navegador **não** permite restaurar arquivos; o formulário avisa: “Se você recarregar ou fechar a página, será preciso anexar os arquivos de novo” |
+
+## Painel administrativo
+| Teste | Resultado | Evidência |
+| --- | --- | --- |
+| Erro de validação (JSON inválido em departamento) | ✅ | erro **junto do campo**, campo destacado, resumo no topo; nome, categoria, chamada, resumo, ordem e “ativo” **mantidos** |
+| Corrigir e salvar | ✅ | grava e redireciona (sem falsa mensagem de falha) |
+| Valor duplicado (slug) | ✅ | “Já existe um registro com este valor” no campo Slug; demais campos mantidos |
+| Falha de conexão (Server Action) | ✅ | “Falha de conexão… Seus dados foram mantidos”; formulário preenchido; botão reabilitado |
+| Observações do orçamento | ✅ | falha de conexão mantém status e o texto da anotação; novo clique salva |
+| Configurações | ✅ | Instagram sem `https://` e GA inválido: erro no campo certo (um por vez), demais valores mantidos, **nada salvo** |
+| Convite de usuário | ✅ | e-mail inválido: erro no campo; e-mail **e papel** mantidos |
+| Login | ✅ | senha errada: e-mail mantido, **senha nunca devolvida**, URL sem `?erro=` |
+| Selects após erro | ✅ | corrigido: o select voltava ao primeiro valor (categoria “Motion” virava “Design”) |
+
+## Arquivos órfãos no Storage
+| Cenário | Resultado |
+| --- | --- |
+| Trocar a imagem antes de salvar | ✅ a anterior (enviada nesta edição) é descartada |
+| “Remover arquivo” antes de salvar | ✅ descartado |
+| Arquivo só enviado e a página abandonada | ✅ **`npm run cleanup:orphans`** achou e removeu (simulação por padrão; `--apply` apaga; só arquivos > 24 h) |
+| Orçamento: falha ao vincular anexos | ✅ os arquivos enviados são removidos; a resposta informa `attachmentsFailed` |
+| Resposta perdida + reenvio | ✅ anexos não são reenviados (1 arquivo no Storage) |
+| Descarte seguro | ✅ `discardUpload` só apaga na pasta do campo e se **nenhuma tabela** referencia a URL |
+
+## Segurança e privacidade
+- Nada é gravado em `localStorage`/`sessionStorage` pelos formulários; os valores ficam só na memória da página.
+- **0** ocorrências de dados do orçamento nos logs do servidor (a rota de orçamentos não registra corpo, nome, e-mail ou telefone; erros devolvem apenas códigos).
+- Toda validação é refeita no servidor (Zod); limites de tamanho espelham os `check` do banco, então valor aceito nunca vira erro 500.
+- Idempotência: coluna `leads.idempotency_key uuid unique` (migração **0005**); duas requisições simultâneas com a mesma chave resultam em um orçamento.
+
+## Pendências desta frente
+- ⚠️ Erros de validação do **servidor** no painel mostram **um campo por vez** (o primeiro inválido); a validação do formulário público mostra todos.
+- ⚠️ Arquivos enviados e abandonados dependem da varredura `cleanup:orphans` (agendar, p.ex., diariamente: Vercel Cron ou GitHub Actions).
+- ⚠️ O navegador não restaura anexos após recarregar a página (limitação da plataforma; o usuário é avisado).
+- ℹ️ Com a CSP em modo obrigatório, o Zod 4 tenta `new Function` para otimização e cai no caminho normal quando bloqueado (gera apenas um relatório `eval` no modo Report-Only).
+
+---
+
 # Homologação — resultado da execução (Supabase real)
 
 **Ambiente:** app local (build de produção, `localhost:3100`) × projeto Supabase de homologação `ejevkmynwljegfpalsci`.

@@ -4,7 +4,8 @@ import { createClientFromLead, updateLead } from "@/app/admin/actions";
 import { requireRole } from "@/lib/admin/auth";
 import { leadStatusLabel, leadStatuses } from "@/lib/admin/resources";
 import { buildWaLink } from "@/lib/contact";
-import { AdminButton, inputCls, Notice, PageTitle } from "@/components/admin/ui";
+import { AdminButton, Notice, PageTitle } from "@/components/admin/ui";
+import { LeadForm } from "@/components/admin/SimpleForms";
 import { SubmitButton } from "@/components/admin/SubmitButton";
 
 type Props = {
@@ -91,32 +92,12 @@ export default async function LeadDetailPage({ params, searchParams }: Props) {
         </dl>
 
         <div>
-          <form action={updateLead.bind(null, id)} className="space-y-4">
-            <label className="block">
-              <span className="mb-1.5 block font-mono text-xs tracking-widest uppercase">
-                Status
-              </span>
-              <select name="status" defaultValue={lead.status} className={inputCls}>
-                {leadStatuses.map((l) => (
-                  <option key={l.value} value={l.value}>
-                    {l.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block">
-              <span className="mb-1.5 block font-mono text-xs tracking-widest uppercase">
-                Observações internas
-              </span>
-              <textarea
-                name="notes"
-                rows={5}
-                defaultValue={lead.notes ?? ""}
-                className={inputCls}
-              />
-            </label>
-            <SubmitButton>Salvar</SubmitButton>
-          </form>
+          <LeadForm
+            action={updateLead.bind(null, id)}
+            statuses={leadStatuses}
+            status={lead.status}
+            notes={lead.notes ?? ""}
+          />
 
           <div className="mt-8">
             {lead.client_id ? (

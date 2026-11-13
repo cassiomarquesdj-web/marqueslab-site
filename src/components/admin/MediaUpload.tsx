@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { createUploadUrl } from "@/app/admin/actions";
+import { createUploadUrl, discardUpload } from "@/app/admin/actions";
 import { createClient } from "@/lib/supabase/client";
 import { MAX_IMAGE_BYTES, MAX_VIDEO_BYTES, validateMedia } from "@/lib/media";
 
@@ -36,6 +36,14 @@ export function MediaUpload({
   const [url, setUrl] = useState(current);
   const [state, setState] = useState<State>({ kind: "idle" });
   const fileRef = useRef<HTMLInputElement>(null);
+  // arquivos enviados nesta edição e ainda não salvos: se forem trocados/removidos, são descartados
+  const sessionUploads = useRef(new Set<string>());
+
+  const discardIfUnsaved = (oldUrl: string) => {
+    if (!oldUrl || !sessionUploads.current.has(oldUrl)) return;
+    sessionUploads.current.delete(oldUrl);
+    void discardUpload(resourceKey, fieldName, oldUrl).catch(() => {});
+  };
 
   const onPick = async (file: File | undefined) => {
     if (!file) return;
@@ -43,18 +51,29 @@ export function MediaUpload({
     if (problem) return setState({ kind: "error", message: problem });
 
     setState({ kind: "uploading", name: file.name });
-    const grant = await createUploadUrl(resourceKey, fieldName, file.name, file.size, file.type);
-    if (!grant.ok) return setState({ kind: "error", message: grant.error });
+    try {
+      const grant = await createUploadUrl(resourceKey, fieldName, file.name, file.size, file.type);
+      if (!grant.ok) return setState({ kind: "error", message: grant.error });
 
-    const storage = createClient().storage.from("media");
-    const { error } = await storage.uploadToSignedUrl(grant.path, grant.token, file, {
-      contentType: file.type,
-    });
-    if (error) return setState({ kind: "error", message: "Falha no envio. Tente novamente." });
+      const storage = createClient().storage.from("media");
+      const { error } = await storage.uploadToSignedUrl(grant.path, grant.token, file, {
+        contentType: file.type,
+      });
+      if (error) return setState({ kind: "error", message: "Falha no envio. Tente novamente." });
 
-    setUrl(storage.getPublicUrl(grant.path).data.publicUrl);
-    setState({ kind: "idle" });
-    if (fileRef.current) fileRef.current.value = "";
+      const next = storage.getPublicUrl(grant.path).data.publicUrl;
+      discardIfUnsaved(url);
+      sessionUploads.current.add(next);
+      setUrl(next);
+      setState({ kind: "idle" });
+      if (fileRef.current) fileRef.current.value = "";
+    } catch {
+      // queda de conexão: o arquivo anterior e o restante do formulário continuam como estavam
+      setState({
+        kind: "error",
+        message: "Sem conexão. O envio não foi concluído; tente novamente.",
+      });
+    }
   };
 
   const limit = allowVideo
@@ -101,7 +120,10 @@ export function MediaUpload({
       {url && state.kind !== "uploading" && (
         <button
           type="button"
-          onClick={() => setUrl("")}
+          onClick={() => {
+            discardIfUnsaved(url);
+            setUrl("");
+          }}
           className="font-mono text-xs tracking-widest text-red-400 uppercase hover:underline"
         >
           Remover arquivo

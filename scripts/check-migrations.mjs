@@ -271,6 +271,26 @@ check(
   ).denied === true,
   "validações do banco rejeitam dados inválidos",
 );
+// idempotência: a mesma chave não grava dois orçamentos (reenvio após resposta perdida)
+const idem = (name) =>
+  `insert into public.leads (name,whatsapp,email,category,description,idempotency_key) values ('${name}','91999999999','i@x.com','Motion','Descrição suficiente','11111111-1111-1111-1111-111111111111')`;
+await db.exec(idem("Idem"));
+let duplicadoBloqueado = false;
+try {
+  await db.exec(idem("Idem2"));
+} catch {
+  duplicadoBloqueado = true;
+}
+check(duplicadoBloqueado, "mesma chave de idempotência não grava orçamento duplicado");
+check(
+  (
+    await q(
+      "select count(*)::int c from public.leads where idempotency_key = '11111111-1111-1111-1111-111111111111'",
+    )
+  )[0].c === 1,
+  "apenas 1 orçamento por chave de idempotência",
+);
+await db.exec("delete from public.leads where name = 'Idem'");
 await db.exec(
   `insert into public.clients (name,email,phone) values ('Maria','m@x.com','91999999999')`,
 );
