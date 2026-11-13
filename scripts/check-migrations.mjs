@@ -54,7 +54,21 @@ const SALES = "00000000-0000-0000-0000-000000000003";
 await db.exec(
   `insert into auth.users (id,email) values ('${ADMIN}','a@x.com'),('${EDITOR}','b@x.com'),('${SALES}','c@x.com');`,
 );
-await db.exec(`update public.profiles set role='sales' where id='${SALES}'`);
+const before = Object.fromEntries(
+  (await q("select id, active from public.profiles")).map((r) => [r.id, r.active]),
+);
+check(
+  before[ADMIN] === true && before[EDITOR] === false && before[SALES] === false,
+  "primeiro usuário nasce ativo; os seguintes nascem INATIVOS (sem acesso)",
+);
+check(
+  (await as("authenticated", EDITOR, "select count(*)::int c from public.projects")).rows[0].c ===
+    0,
+  "usuário recém-cadastrado (inativo) não lê nem rascunhos",
+);
+await db.exec(
+  `update public.profiles set role='sales', active=true where id='${SALES}'; update public.profiles set active=true where id='${EDITOR}'`,
+);
 const prof = Object.fromEntries(
   (await q("select id, role from public.profiles")).map((r) => [r.id, r.role]),
 );

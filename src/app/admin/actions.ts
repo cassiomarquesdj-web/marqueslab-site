@@ -287,10 +287,14 @@ export async function inviteUser(formData: FormData) {
     return back("/admin/usuarios", {
       erro: "Defina SUPABASE_SERVICE_ROLE_KEY para convidar usuários.",
     });
-  const { data, error } = await admin.auth.admin.inviteUserByEmail(email);
+  // O link do e-mail leva à página de definição de senha do próprio site (origem da requisição).
+  const origin = (await headers()).get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
+    redirectTo: `${origin}/admin/definir-senha`,
+  });
   if (error || !data.user)
     return back("/admin/usuarios", { erro: "Não foi possível enviar o convite." });
-  await admin.from("profiles").update({ role }).eq("id", data.user.id);
+  await admin.from("profiles").update({ role, active: true }).eq("id", data.user.id);
   await logActivity(s, "invite", "profiles", data.user.id, { email, role });
   redirect("/admin/usuarios?salvo=1");
 }

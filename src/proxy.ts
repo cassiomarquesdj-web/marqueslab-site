@@ -20,7 +20,8 @@ export async function proxy(request: NextRequest) {
 
   const { data } = await supabase.auth.getUser();
   const { pathname } = request.nextUrl;
-  const isLogin = pathname === "/admin/login";
+  // páginas acessíveis sem sessão: login e a definição de senha (destino do convite)
+  const isLogin = pathname === "/admin/login" || pathname === "/admin/definir-senha";
 
   if (!data.user && !isLogin) {
     const url = request.nextUrl.clone();

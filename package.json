@@ -12,6 +12,7 @@
     "test": "vitest run",
     "db:check": "node scripts/check-migrations.mjs",
     "db:seed": "node scripts/generate-seed.mts",
+    "seed:remote": "node --env-file=.env.local scripts/seed-remote.mts",
     "verify:supabase": "node --env-file=.env.local scripts/verify-supabase.mjs"
   },
   "engines": {

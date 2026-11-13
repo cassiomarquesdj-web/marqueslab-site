@@ -56,7 +56,7 @@ async function makeUser(role) {
     user_metadata: { full_name: `${P} ${role}` },
   });
   if (error) throw error;
-  await admin.from("profiles").update({ role }).eq("id", data.user.id);
+  await admin.from("profiles").update({ role, active: true }).eq("id", data.user.id);
   const c = createClient(url, anonKey, opts);
   const { error: e2 } = await c.auth.signInWithPassword({ email, password });
   if (e2) throw e2;
@@ -348,8 +348,14 @@ try {
     const stillThere =
       (await fetch(anon.storage.from("media").getPublicUrl(path).data.publicUrl)).status === 200;
     const e = await E.db.storage.from("media").remove([path]);
+    // A URL pública pode continuar em cache na CDN por um tempo após a exclusão; o parâmetro
+    // aleatório força a consulta à origem e confirma que o objeto realmente foi removido.
     const gone =
-      (await fetch(anon.storage.from("media").getPublicUrl(path).data.publicUrl)).status !== 200;
+      (
+        await fetch(
+          `${anon.storage.from("media").getPublicUrl(path).data.publicUrl}?t=${Date.now()}`,
+        )
+      ).status !== 200;
     return stillThere && !e.error && gone && (s.data ?? []).length === 0;
   });
 

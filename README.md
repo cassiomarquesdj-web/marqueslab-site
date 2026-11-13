@@ -22,7 +22,7 @@ e o formulário de orçamento informa que o recebimento ainda não está ativo.
 ## Conectando o Supabase
 
 1. Crie um projeto em supabase.com.
-2. No **SQL Editor**, rode em ordem: `supabase/migrations/0001_init.sql`, `0002_project_client_name.sql`, `0003_storage_limits_and_privacy.sql` e depois `supabase/seed.sql`
+2. No **SQL Editor**, rode em ordem: `supabase/migrations/0001_init.sql`, `0002_project_client_name.sql`, `0003_storage_limits_and_privacy.sql`, `0004_new_users_inactive.sql` e depois `supabase/seed.sql` (ou `npm run seed:remote`)
    (ou use `supabase db push` com a CLI).
 3. Em **Authentication → Providers → Email**, **desative o cadastro público** (“Allow new users to sign up”).
 4. Crie o primeiro usuário em **Authentication → Users → Add user** (e-mail + senha). **O primeiro usuário vira administrador**;

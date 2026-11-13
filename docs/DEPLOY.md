@@ -28,7 +28,8 @@ Eu não tenho (e não devo ter) acesso às suas contas. Para fechar a homologaç
    1. `supabase/migrations/0001_init.sql` — tabelas, RLS, triggers, buckets e políticas de Storage
    2. `supabase/migrations/0002_project_client_name.sql`
    3. `supabase/migrations/0003_storage_limits_and_privacy.sql` — limites/tipos dos buckets e privacidade de clientes
-   4. `supabase/seed.sql` — departamentos, produtos, categorias, banner e configurações iniciais (idempotente)
+   4. `supabase/migrations/0004_new_users_inactive.sql` — **novos usuários nascem inativos** (só o primeiro vira admin ativo); protege contra cadastro público
+   5. `supabase/seed.sql` — departamentos, produtos, categorias, banner e configurações iniciais (idempotente)
 3. **Authentication → Providers → Email**: desative **“Allow new users to sign up”** (só o admin cria/convida usuários).
    Mantenha “Confirm email” ligado.
 4. **Authentication → URL Configuration**: *Site URL* = URL do Preview (ou do domínio final) e, em *Redirect URLs*, a URL do Preview
@@ -42,6 +43,16 @@ Eu não tenho (e não devo ter) acesso às suas contas. Para fechar a homologaç
 ### Limite de arquivo (plano gratuito × pago)
 O plano gratuito limita **qualquer arquivo a 50 MB**. É por isso que o bucket `media` está em 50 MB. Em plano pago, aumente
 *Storage → Settings → Global file size limit*, edite `file_size_limit` na migração 0003 **e** `MAX_VIDEO_BYTES` em `src/lib/media.ts`.
+
+### Chaves novas × legadas
+Projetos novos do Supabase mostram **Publishable key** (`sb_publishable_…`) e **Secret key** (`sb_secret_…`). Elas funcionam com este código:
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` recebe a *publishable*; `SUPABASE_SERVICE_ROLE_KEY` recebe a *secret* (nunca no navegador). As chaves legadas (JWT) também funcionam.
+
+### Alternativa sem acesso direto ao banco: `npm run seed:remote`
+Carrega o conteúdo inicial pela API (usa a secret key) e é idempotente — equivale ao `seed.sql`.
+
+### Convite de usuários
+O e-mail de convite leva a `/admin/definir-senha` (o usuário define a própria senha). Inclua a URL do site em *Authentication → URL Configuration → Redirect URLs* (ex.: `https://SEU-PREVIEW.vercel.app/**`).
 
 ## 2. Variáveis de ambiente
 
@@ -76,7 +87,7 @@ HOMOLOG_CONFIRM=sim npm run verify:supabase
 ```
 - **Use só no projeto de homologação.** O script se recusa a rodar sem `HOMOLOG_CONFIRM=sim` e imprime o host alvo.
 - Tudo que cria usa o prefixo `zz-homolog-…` e é removido no `finally`.
-- Cobre 39 verificações (login/papéis, CRUD de projetos/serviços/produtos/banners/artigos, orçamentos + histórico + clientes, Storage:
+- Cobre 38 verificações (login/papéis, CRUD de projetos/serviços/produtos/banners/artigos, orçamentos + histórico + clientes, Storage:
   upload, URL assinada, tipos, limites, exclusão). **Não cobre** a interface (botões/telas) nem a exportação CSV (requer sessão de navegador): use `docs/HOMOLOGACAO.md`.
 
 ## 4. Vercel (Preview)

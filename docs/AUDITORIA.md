@@ -201,3 +201,37 @@ Escopo: Supabase real, painel, uploads diretos, Vercel Preview, segurança e doc
 5. **Limitação de requisições em memória** (melhor esforço); recomendável Firewall/Rate Limiting da Vercel ou Upstash antes de divulgar o formulário.
 6. **Decisões de negócio**: retratos/ensaio com IA (serviço do site antigo), depoimentos reais, história da empresa, confirmar o WhatsApp padrão.
 7. Anexos do formulário público limitados a 4 MB.
+
+---
+
+# Rodada 3 — Homologação com Supabase real
+
+Projeto de homologação: `ejevkmynwljegfpalsci` (criado pelo cliente). Executado com o app rodando localmente (build de produção) contra esse projeto.
+
+## 12. O que foi executado e o resultado
+
+| Item | Resultado |
+| --- | --- |
+| Migrações 0001–0004 aplicadas pelo SQL Editor | ✅ sem erros |
+| Seed pela API (`npm run seed:remote`) | ✅ 8 categorias, 7 departamentos, 86 itens, 6 produtos, 1 banner, 10 configurações |
+| **`verify:supabase` contra o projeto real** | ✅ **38 de 38** (login/papéis, CRUD, orçamentos+histórico+clientes, Storage, URL assinada, cascata) |
+| Cadastro público | ❌ estava **ligado** → desligado e confirmado (`disable_signup: true`; `POST /auth/v1/signup` → 422 `signup_disabled`) |
+| Site local lendo do banco | ✅ 10 rotas 200; página de departamento exibe os itens vindos do banco; sitemap com 20 URLs; CSP inclui o host do Supabase |
+| Formulário de orçamento → banco (fluxo real no navegador) | ✅ protocolo `ML-000007`, linha em `leads` e histórico `created` (registro de teste apagado) |
+| Teste de exclusão no Storage | a URL pública continua respondendo 200 por um tempo após excluir (cache da CDN); sem cache → 400. O objeto é de fato removido. |
+
+## 13. Problemas encontrados nesta rodada
+
+| # | Problema | Correção |
+| --- | --- | --- |
+| 1 | **Cadastro público estava ligado** no projeto novo: qualquer pessoa com a chave pública poderia criar conta | desligado; **migração 0004**: novos usuários nascem **inativos** (defesa em profundidade) |
+| 2 | **Convite por e-mail não tinha página de destino** para o usuário definir a senha | nova `/admin/definir-senha`; o convite passa `redirectTo`; o proxy a libera |
+| 3 | `NEXT_PUBLIC_WHATSAPP_NUMBER=` **vazio** (copiado do `.env.example`) anulava o número padrão (`??` não cobre string vazia) | `||` nos três padrões e variáveis opcionais comentadas no `.env.example` |
+| 4 | Verificação marcava falha na exclusão por causa do cache da CDN | script usa *cache-buster* |
+| 5 | Projetos novos usam chaves `sb_publishable_`/`sb_secret_` | documentado; funcionam com o código |
+
+## 14. Ainda depende de ação humana
+
+- Criar o **primeiro administrador** (Authentication → Users → *Add user*; ele vira admin ativo) e fazer login em `/admin`.
+- Validar **pela interface**, logado: CRUD, upload/exclusão de imagem e vídeo, CRM, exportação CSV (checklist `docs/HOMOLOGACAO.md`).
+- SMTP próprio para convites; URL Configuration com o domínio do Preview; Vercel (preset/variáveis).
