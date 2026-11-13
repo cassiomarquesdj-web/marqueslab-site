@@ -101,8 +101,10 @@ export async function saveResource(key: string, id: string | null, formData: For
   const base = `/admin/${key}`;
   const target = id ? `${base}/${id}` : `${base}/novo`;
   const keep = new URLSearchParams();
+  // Só relações OBRIGATÓRIAS (o "pai": projeto da mídia, departamento do item) voltam como filtro
+  // da lista; categoria/cliente opcionais não podem filtrar a lista depois de salvar.
   for (const f of resource.fields)
-    if (f.type === "relation") {
+    if (f.type === "relation" && f.required) {
       const v = formData.get(f.name);
       if (typeof v === "string" && v) keep.set(f.name, v);
     }
@@ -111,6 +113,9 @@ export async function saveResource(key: string, id: string | null, formData: For
     mediaPrefix: prefix(),
   });
   if (error) return back(target, { erro: error, ...Object.fromEntries(keep) });
+  // Mídias: o tipo vem do arquivo enviado, não do select (evita vídeo gravado como "image").
+  if ("kind" in payload && typeof payload.url === "string")
+    payload.kind = /\.(mp4|webm)$/i.test(payload.url) ? "video" : "image";
   for (const f of resource.fields)
     if (f.type === "image" && f.required && !payload[f.name])
       return back(target, { erro: `Envie “${f.label}”.`, ...Object.fromEntries(keep) });
@@ -292,6 +297,10 @@ export async function inviteUser(formData: FormData) {
   const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
     redirectTo: `${origin}/admin/definir-senha`,
   });
+  if (error?.status === 429)
+    return back("/admin/usuarios", {
+      erro: "Limite de e-mails do Supabase atingido (o envio padrão permite poucos por hora). Configure um SMTP próprio em Authentication → SMTP ou tente mais tarde.",
+    });
   if (error || !data.user)
     return back("/admin/usuarios", { erro: "Não foi possível enviar o convite." });
   await admin.from("profiles").update({ role, active: true }).eq("id", data.user.id);

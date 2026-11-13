@@ -11,6 +11,20 @@ type Props = {
   searchParams: Promise<Record<string, string | undefined>>;
 };
 
+/** Texto da célula: booleano em Sim/Não e valores de select pelo rótulo (não pela chave do banco). */
+function cellText(
+  resource: NonNullable<ReturnType<typeof getResource>>,
+  c: { field: string; type?: string },
+  row: Record<string, unknown>,
+) {
+  const v = row[c.field];
+  if (c.type === "boolean") return v ? "Sim" : "Não";
+  const label = resource.fields
+    .find((f) => f.name === c.field)
+    ?.options?.find((o) => o.value === v)?.label;
+  return label ?? String(v ?? "—");
+}
+
 export default async function ResourceListPage({ params, searchParams }: Props) {
   const resource = getResource((await params).resource);
   if (!resource) notFound();
@@ -83,11 +97,7 @@ export default async function ResourceListPage({ params, searchParams }: Props) 
               <tr key={String(r.id)} className="border-b border-white/10">
                 {resource.columns.map((c) => (
                   <td key={c.field} className="py-3 pr-4">
-                    {c.type === "boolean"
-                      ? r[c.field]
-                        ? "Sim"
-                        : "Não"
-                      : String(r[c.field] ?? "—")}
+                    {cellText(resource, c, r)}
                   </td>
                 ))}
                 <td className="flex justify-end gap-5 py-3">

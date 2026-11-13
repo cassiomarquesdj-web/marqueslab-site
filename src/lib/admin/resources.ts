@@ -51,7 +51,12 @@ export type Resource = {
   related?: { resource: string; fk: string; label: string }[];
 };
 
-const slugField: Field = { name: "slug", label: "Slug (URL)", type: "text", required: true };
+const slugField: Field = {
+  name: "slug",
+  label: "Slug (URL)",
+  type: "text",
+  help: "Opcional: se vazio, é gerado a partir do título.",
+};
 const sortField: Field = { name: "sort", label: "Ordem", type: "number" };
 
 export const resources: Resource[] = [

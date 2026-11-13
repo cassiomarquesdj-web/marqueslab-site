@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
 
 export const inputCls =
-  "bg-ink-2 w-full border border-white/15 px-3 py-2.5 text-sm text-white focus:border-flame focus:outline-none";
+  "bg-ink-2 w-full border border-white/15 px-3 py-3 text-sm text-white focus:border-flame focus:outline-none";
 
 export function Notice({
   params,

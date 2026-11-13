@@ -1,4 +1,66 @@
-# Checklist de homologação
+# Homologação — resultado da execução (Supabase real)
+
+**Ambiente:** app local (build de produção, `localhost:3100`) × projeto Supabase de homologação `ejevkmynwljegfpalsci`.
+**Como foi feito:** administrador real logado no Chrome (a senha foi digitada pelo próprio dono); editor e comercial em um navegador isolado, entrando por link gerado (nenhuma senha foi digitada por mim).
+**Dados de teste:** todos identificados como “HOMOLOGAÇÃO” e **removidos ao final** (inventário final: 0 projetos, 0 mídias, 0 clientes, 0 orçamentos, 0 arquivos nos buckets; seed intacto: 8 categorias, 7 departamentos, 86 itens, 6 produtos, banner e 10 configurações originais).
+Legenda: ✅ aprovado · ❌ reprovado/limitação · ⏭ não executado.
+
+## Pelo painel (interface)
+
+| # | Teste | Resultado | Evidência |
+| --- | --- | --- | --- |
+| 1 | Dashboard e indicadores | ✅ | cartões batem com os dados (projetos 1/1/0, solicitações 2, em andamento 1, clientes 2); 10 atividades recentes; aviso de Analytics |
+| 2 | Projeto: criar, validar, editar, publicar, excluir | ✅ | erro “Preencha Título”; rascunho 404 no site; publicado aparece em /portfolio, na Home (destaque) e na página do projeto; edição persistiu; exclusão com 404 depois |
+| 3 | Upload de imagem (capa, galeria) | ✅ | upload direto; miniatura; troca de capa **removeu** a antiga do Storage |
+| 4 | Upload de vídeo **49 MB** | ✅ | 13 s; Storage guardou 49 MB `video/mp4`; tocou como `<video>` no site; 51 MB e SVG recusados na hora |
+| 5 | Exclusão de arquivos do Storage | ✅ | excluir mídia e excluir projeto removeram capa + galeria + vídeo (200→400 sem cache); cancelar a confirmação preservou tudo |
+| 6 | Departamentos e itens de serviço | ✅ | JSON inválido → erro claro; item com pai pré-selecionado; benefícios/FAQ no site; desativar some; excluir apaga itens em cascata |
+| 7 | Produtos digitais e banners | ✅ | status “Em testes” no site; banner `hero` refletiu na Home e foi restaurado; chave do banner bloqueada na edição |
+| 8 | Clientes | ✅ | criar, editar (persistiu), buscar (`?q=`), excluir; ficha mostra o projeto vinculado; nome exibido no site |
+| 9 | Orçamentos | ✅ | formulário público com anexo → `ML-000008`; lista, busca por nome/protocolo, filtros por status e serviço; anexo abre por URL assinada; link de WhatsApp |
+| 10 | Histórico | ✅ | criação, status (com seta de/para), observação, em ordem; autor registrado no banco (verify) |
+| 11 | Exportação CSV | ✅ | BOM UTF-8, cabeçalho, filtros por status/serviço; `=HOMOLOGAÇÃO` saiu como `'=HOMOLOGAÇÃO`; aspas escapadas. ⏭ clique no botão com download no navegador (testado por requisição autenticada) |
+| 12 | Convite de usuário | ✅/❌ | 1º convite pela interface: perfil criado ativo como Editor. **2º convite: ❌ limite de e-mails do Supabase (429)** — mensagem agora explica a causa |
+| 13 | Definir senha pelo link | ✅/⏭ | link gerado → página validou → você definiu a senha → login OK (administrador real); sem link: “Link inválido ou expirado”. ⏭ link **recebido por e-mail** (o e-mail não chegou: mesmo limite de SMTP) |
+| 14 | Permissões | ✅ | ver abaixo |
+
+### Permissões por papel
+| Papel | Menu | Acesso direto negado | Escrita | CSV |
+| --- | --- | --- | --- | --- |
+| Administrador | tudo | — | tudo | ✅ |
+| Editor | Projetos, Departamentos, Itens, Produtos, Banners, Conteúdo, Categorias, Mídias | Orçamentos, Clientes, Configurações, Usuários → `/admin?negado=1` + mensagem | editou projeto (persistiu); só vê **nomes** de clientes no select | 401 ✅ |
+| Comercial | Dashboard, Orçamentos, Clientes | Projetos, Usuários, Configurações → negado; dashboard sem contagem de projetos | mudou status/observação com histórico | 200 ✅ |
+| Sem login | — | `/admin` → login | — | 401 ✅ |
+| Admin tentando rebaixar a si mesmo | — | “Você não pode remover seu próprio acesso” ✅ | desativar/reativar outro usuário ✅ | — |
+
+## Qualidade transversal
+| Item | Resultado |
+| --- | --- |
+| Estados de carregamento | ✅ botões “Salvando…”/“Enviando…”/“Entrando…” desabilitados; esqueleto “Carregando…”; campo de arquivo bloqueado durante envio |
+| Mensagens de sucesso/erro | ✅ (`role=status`/`role=alert`) |
+| Confirmação de exclusão | ✅ pergunta; cancelar não exclui; confirmar exclui |
+| Responsividade (375 px) | ✅ dashboard, lista, detalhe e formulário sem rolagem horizontal; menu quebra em linhas |
+| Console | ✅ sem erros do app. Avisos: `THREE.Clock` (biblioteca) e CSP Report-Only (do próprio teste); 1 × 401 esperado (CSV do editor) |
+| Rede | ✅ sem falhas; `ERR_ABORTED` apenas em *prefetch* `_rsc` cancelados pelo Next |
+| Login com senha errada | ✅ “E-mail ou senha incorretos.”, botão “Entrando…” |
+
+## Problemas encontrados nesta execução
+| Problema | Estado |
+| --- | --- |
+| Após salvar um projeto com categoria, a lista ficava **filtrada por essa categoria** | ✅ corrigido (só relações obrigatórias viram filtro) |
+| Mídia de vídeo era gravada como `image` (select padrão) e quebraria no site | ✅ corrigido (tipo deduzido do arquivo) |
+| Campo “Slug” aparecia como obrigatório mas é gerado do título | ✅ corrigido |
+| Convite com limite de e-mail: mensagem genérica | ✅ mensagem específica |
+| Coluna “Status” dos produtos mostrava a chave (`em_testes`) | ✅ mostra o rótulo |
+| Campos de formulário com ~38 px de altura (alvo de toque) | ✅ 44 px |
+| **Erro de validação limpa o formulário** (o redirecionamento perde o que foi digitado) | ⚠️ aberto (melhoria: `useActionState`) |
+| Logo após publicar, a **primeira** visita pública pode ver a versão antiga (revalidação *stale-while-revalidate*) | ⚠️ aberto/aceitável; a seguinte já vê o novo |
+| E-mails de convite não chegam em volume: SMTP padrão do Supabase (limite baixo) | ⚠️ **configurar SMTP próprio antes do lançamento** |
+| Validação de gravação real de e-mail de convite recebido | ⏭ depende do SMTP |
+
+---
+
+# Checklist de homologação (modelo para repetir no Preview/produção)
 
 Execute no **Preview da Vercel conectado ao Supabase de homologação** (veja `docs/DEPLOY.md`). Marque cada item.
 Legenda da coluna **Auto**: ✅ já coberto por teste automatizado (e qual) · 🧪 coberto só em teste sem credenciais · ❌ somente manual.
